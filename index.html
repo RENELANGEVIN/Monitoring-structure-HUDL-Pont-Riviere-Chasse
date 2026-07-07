@@ -256,6 +256,17 @@ canvas{max-width:100%;background:#fff;}
   </div>
 
   <div class="card">
+    <h2>Paires de points (pendage)</h2>
+    <p class="hint">Associez un point du bas à son point du haut (ex. 101 / 111) pour calculer automatiquement l'angle de pendage entre les deux, exprimé en angle zénithal (DMS). Utile pour détecter une bascule progressive d'un mur ou d'une structure verticale.</p>
+    <div id="pairsList"></div>
+    <div class="rowline">
+      <div class="field"><label>Point du bas</label><select id="newPairBas"></select></div>
+      <div class="field"><label>Point du haut</label><select id="newPairHaut"></select></div>
+      <button class="btn secondary" onclick="addPair()">+ Ajouter la paire</button>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Instruments</h2>
     <p class="hint">Fabricant — modèle — no série — certificat d'étalonnage. Choisi ou créé à chaque import.</p>
     <div id="instrList"></div>
@@ -412,6 +423,7 @@ canvas{max-width:100%;background:#fff;}
   <div class="card">
     <h2>Tableau comparatif PM / EC</h2>
     <p class="hint">EC = écart perpendiculaire à l'axe (colonne critique). PM = déplacement longitudinal. « vs préc. » = valeur de ce point à la ronde précédente (vs étalon), pour comparaison — non cumulative : la valeur EC init demeure la référence à considérer en premier.</p>
+    <p class="small" id="axeUsedBox" style="margin-bottom:10px;"></p>
     <div id="bannerBox"></div>
     <div id="resultsTableBox"></div>
   </div>
@@ -437,6 +449,11 @@ canvas{max-width:100%;background:#fff;}
     <h2>Diagrammes de déplacement PM / EC par point</h2>
     <p class="hint">Centre = étalon de référence. Ligne verte = axe PM. Cercles = seuils de tolérance (jaune/rouge). Points numérotés par ordre chronologique des rondes.</p>
     <div id="pointDiagramsBox" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"></div>
+  </div>
+  <div class="card">
+    <h2>Pendage des paires de points (angle zénithal)</h2>
+    <p class="hint">Angle mesuré depuis la verticale (0° = parfaitement à l'aplomb, 90° = horizontal) entre chaque point du bas et son point du haut associé. <b>Le déversement horizontal indiqué est celui mesuré entre les deux points/prismes eux-mêmes, pas nécessairement celui de la face du mur</b> — les points d'observation ne sont pas nécessairement à égale distance du mur, et il n'est ni pratique ni nécessaire de les y positionner avec cette précision. L'évolution de cet écart d'une ronde à l'autre (comparé à l'étalon) demeure néanmoins représentative d'un éventuel mouvement du mur. <b>« Écart converti »</b> traduit l'écart angulaire en un déplacement linéaire équivalent (mm) à la distance en pente mesurée entre les deux points (distance × tan(écart)) — ex. un écart de 1'30" sur 5 m de distance en pente représente environ 2,2 mm. Configurez les paires dans l'onglet Configuration. Aucune paire configurée = section vide.</p>
+    <div id="pendageTableBox"></div>
   </div>
 </div>
 
@@ -472,7 +489,8 @@ function newStructure(name){
     points: ["101","111","102","112","103","113"],
     refPoints: ["REF1","REF2","REF3"],
     rounds: [],
-    pointMapping: {}
+    pointMapping: {},
+    pairs: [] // paires bas/haut pour le calcul du pendage (angle zénithal)
   };
 }
 
@@ -482,8 +500,8 @@ function newStructure(name){
    full desktop copy of this file. In the file you are looking at right now,
    they remain untouched, so the app behaves as the normal, fully editable
    desktop version. */
-const __EXPORTED_STATE_RAW__ = "{\"config\":{\"client\":\"HUDL\",\"projet\":\"AN-26-008- PONT 20621 RIVIÈRE CHASSÉ\",\"resp\":\"Arpent-Nord Construction\",\"sys\":\"SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28\",\"fc\":1,\"decimals\":3},\"instruments\":[{\"id\":\"i2\",\"fab\":\"Leica\",\"mod\":\"TS1203\",\"ser\":\"—\",\"cal\":\"—\"},{\"id\":\"i1783357921713\",\"fab\":\"Leica\",\"mod\":\"MS60 1\\\" R2000\",\"ser\":\"885396\",\"cal\":\"885396-251229-1059/29. Décembre 2025\"}],\"structures\":[{\"id\":\"s1783350091097882\",\"name\":\"MUR DE REMBLAIS EXISTANT\",\"axeA\":\"101\",\"axeB\":\"102\",\"jaune\":3,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"101\",\"102\",\"103\",\"111\",\"112\",\"113\"],\"refPoints\":[\"53\"],\"rounds\":[{\"id\":\"r1783362493363\",\"date\":\"2026-06-13\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.157,\"z\":163.967},\"102\":{\"n\":5146856.875,\"e\":264465.988,\"z\":163.975},\"103\":{\"n\":5146848.277,\"e\":264462.262,\"z\":163.775},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.976},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.015},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783367540498\",\"date\":\"2026-06-20\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368120659\",\"date\":\"2026-06-25\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.32,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.186,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783362193699\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"Levé étalon de référence\",\"isReference\":true,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368395307\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783369145955\",\"date\":\"2026-07-01\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.277,\"e\":264462.26,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783369267499\",\"date\":\"2026-07-04\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.012},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[]}],\"pointMapping\":{},\"etalonLocked\":true,\"viewRoundId\":null},{\"id\":\"s1783350102160448\",\"name\":\"MUR BERLINOIS\",\"axeA\":\"MON1\",\"axeB\":\"MON1\",\"jaune\":2,\"rouge\":3,\"trendEps\":0.15,\"points\":[\"MON1\",\"MON11\",\"MON2\",\"MON12\",\"MON3\",\"MON13\"],\"refPoints\":[\"REF1\",\"REF2\",\"REF3\"],\"rounds\":[],\"pointMapping\":{}}],\"activeStructureId\":\"s1783350091097882\"}";
-const __EXPORT_TIMESTAMP__ = "7 juillet 2026 à 13 h 01";
+const __EXPORTED_STATE_RAW__ = "{\"config\":{\"client\":\"HUDL\",\"projet\":\"AN-26-008- PONT 20621 RIVIÈRE CHASSÉ\",\"resp\":\"Arpent-Nord Construction\",\"sys\":\"SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28\",\"fc\":1,\"decimals\":3},\"instruments\":[{\"id\":\"i2\",\"fab\":\"Leica\",\"mod\":\"TS1203\",\"ser\":\"—\",\"cal\":\"—\"},{\"id\":\"i1783357921713\",\"fab\":\"Leica\",\"mod\":\"MS60 1\\\" R2000\",\"ser\":\"885396\",\"cal\":\"885396-251229-1059/29. Décembre 2025\"}],\"structures\":[{\"id\":\"s1783350091097882\",\"name\":\"MUR DE REMBLAIS EXISTANT\",\"axeA\":\"101\",\"axeB\":\"102\",\"jaune\":3,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"101\",\"102\",\"103\",\"111\",\"112\",\"113\"],\"refPoints\":[\"53\"],\"rounds\":[{\"id\":\"r1783362493363\",\"date\":\"2026-06-13\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.157,\"z\":163.967},\"102\":{\"n\":5146856.875,\"e\":264465.988,\"z\":163.975},\"103\":{\"n\":5146848.277,\"e\":264462.262,\"z\":163.775},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.976},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.015},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783367540498\",\"date\":\"2026-06-20\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368120659\",\"date\":\"2026-06-25\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.32,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.186,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783362193699\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"Levé étalon de référence\",\"isReference\":true,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368395307\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783369145955\",\"date\":\"2026-07-01\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.277,\"e\":264462.26,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783369267499\",\"date\":\"2026-07-04\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.012},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[]}],\"pointMapping\":{},\"etalonLocked\":true,\"viewRoundId\":null,\"pairs\":[{\"id\":\"pr178344615167329\",\"bas\":\"101\",\"haut\":\"111\"},{\"id\":\"pr1783446158121250\",\"bas\":\"102\",\"haut\":\"112\"},{\"id\":\"pr1783446164273167\",\"bas\":\"103\",\"haut\":\"113\"}]},{\"id\":\"s1783350102160448\",\"name\":\"MUR BERLINOIS\",\"axeA\":\"MON1\",\"axeB\":\"MON1\",\"jaune\":2,\"rouge\":3,\"trendEps\":0.15,\"points\":[\"MON1\",\"MON11\",\"MON2\",\"MON12\",\"MON3\",\"MON13\"],\"refPoints\":[\"REF1\",\"REF2\",\"REF3\"],\"rounds\":[],\"pointMapping\":{}}],\"activeStructureId\":\"s1783350091097882\"}";
+const __EXPORT_TIMESTAMP__ = "7 juillet 2026 à 14 h 12";
 let VIEW_ONLY = ("true" === "true");
 let __EXPORTED_STATE__ = null;
 if(__EXPORTED_STATE_RAW__ !== "__STATE_JSON_PLACEHOLDER__"){
@@ -685,6 +703,8 @@ function renderConfigLists(){
     <div class="list-item"><span class="txt"><b>${p}</b></span>
     <button class="icon-x" onclick="removeRefPoint(${i})">✕</button></div>`).join('') || '<p class="small">Aucun point de référence.</p>';
 
+  renderPairsList();
+
   {
     const optsHtml = s.points.map(p=>`<option value="${p}">${p}</option>`).join('');
     const selA = document.getElementById('cfgAxeA');
@@ -740,6 +760,88 @@ function addRefPoint(){
   renderConfigLists(); markDirty();
 }
 function removeRefPoint(i){ cur().refPoints.splice(i,1); renderConfigLists(); markDirty(); }
+
+/* ---------------- PAIRES BAS/HAUT (PENDAGE) ---------------- */
+function renderPairsList(){
+  const s = cur();
+  if(!s.pairs) s.pairs = [];
+  const box = document.getElementById('pairsList');
+  if(box){
+    box.innerHTML = s.pairs.map((p,i)=>`
+      <div class="list-item"><span class="txt"><b>${p.bas}</b> (bas) → <b>${p.haut}</b> (haut)</span>
+      <button class="icon-x" onclick="removePair(${i})">✕</button></div>`).join('') || '<p class="small">Aucune paire configurée.</p>';
+  }
+  const optsHtml = s.points.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const basSel = document.getElementById('newPairBas');
+  const hautSel = document.getElementById('newPairHaut');
+  if(basSel) basSel.innerHTML = optsHtml;
+  if(hautSel) hautSel.innerHTML = optsHtml;
+}
+function addPair(){
+  const s = cur();
+  if(!s.pairs) s.pairs = [];
+  const bas = document.getElementById('newPairBas').value;
+  const haut = document.getElementById('newPairHaut').value;
+  if(!bas || !haut){ alert('Choisissez un point du bas et un point du haut.'); return; }
+  if(bas===haut){ alert('Le point du bas et du haut doivent être différents.'); return; }
+  if(s.pairs.some(p=>p.bas===bas && p.haut===haut)){ alert('Cette paire existe déjà.'); return; }
+  s.pairs.push({id:'pr'+Date.now()+Math.floor(Math.random()*1000), bas, haut});
+  renderPairsList(); markDirty();
+}
+function removePair(i){ cur().pairs.splice(i,1); renderPairsList(); markDirty(); }
+function toDMS(deg){
+  const sign = deg<0 ? '-' : '';
+  const a = Math.abs(deg);
+  const d = Math.floor(a);
+  const mFull = (a-d)*60;
+  const m = Math.floor(mFull);
+  const sec = (mFull-m)*60;
+  return `${sign}${d}°${String(m).padStart(2,'0')}'${sec.toFixed(1)}"`;
+}
+function computePendage(bas, haut){
+  if(!bas || !haut) return null;
+  const dN = haut.n - bas.n;
+  const dE = haut.e - bas.e;
+  const dZ = haut.z - bas.z;
+  const horiz = Math.hypot(dN, dE);
+  const pente = Math.hypot(dN, dE, dZ); // distance en pente (3D) entre les deux points
+  const zenithDeg = Math.atan2(horiz, dZ) * 180 / Math.PI; // 0° = parfaitement à l'aplomb (vertical)
+  let bearingDeg = Math.atan2(dE, dN) * 180 / Math.PI; if(bearingDeg<0) bearingDeg += 360;
+  return {dN, dE, dZ, horiz, pente, zenithDeg, bearingDeg};
+}
+function renderPendageTable(data, curIdx){
+  const s = cur();
+  const box = document.getElementById('pendageTableBox');
+  if(!box) return;
+  if(!s.pairs || s.pairs.length===0){ box.innerHTML=''; return; }
+  const curRound = data.sortedRounds[curIdx];
+  const rows = s.pairs.map(pair=>{
+    const basEt = data.ref.points[pair.bas], hautEt = data.ref.points[pair.haut];
+    const basCur = curRound ? curRound.points[pair.bas] : null;
+    const hautCur = curRound ? curRound.points[pair.haut] : null;
+    const etCalc = computePendage(basEt, hautEt);
+    const curCalc = computePendage(basCur, hautCur);
+    if(!etCalc || !curCalc){
+      return `<tr><td class="left">${pair.bas} / ${pair.haut}</td><td colspan="6" class="small">Données insuffisantes pour cette paire à cette ronde</td></tr>`;
+    }
+    const deltaDeg = curCalc.zenithDeg - etCalc.zenithDeg;
+    const convertedMM = curCalc.pente * Math.tan(deltaDeg*Math.PI/180) * 1000;
+    return `<tr>
+      <td class="left">${pair.bas} (bas) / ${pair.haut} (haut)</td>
+      <td>${curCalc.pente.toFixed(3)} m</td>
+      <td>${toDMS(curCalc.zenithDeg)}</td>
+      <td>${toDMS(etCalc.zenithDeg)}</td>
+      <td>${deltaDeg>=0?'+':''}${toDMS(deltaDeg)}</td>
+      <td>${convertedMM>=0?'+':''}${convertedMM.toFixed(1)} mm</td>
+      <td>${(curCalc.horiz*1000).toFixed(1)} mm</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table class="data">
+    <tr><th class="left">Paire (bas / haut)</th><th>Distance en pente</th><th>Angle zénithal — ronde courante</th><th>Angle zénithal — étalon</th><th>Écart</th><th>Écart converti (à cette distance)</th><th>Déversement horizontal</th></tr>
+    ${rows}
+  </table>`;
+}
+
 function resetDefaultPoints(){
   if(!confirm("Remplacer la liste actuelle des points de monitoring par les noms par défaut (101, 111, 102, 112, 103, 113) ? Les correspondances déjà mémorisées vers d'anciens noms devront être refaites.")) return;
   cur().points = ["101","111","102","112","103","113"];
@@ -1298,6 +1400,8 @@ function renderResults(){
   const box = document.getElementById('resultsTableBox');
   const zBox = document.getElementById('zTableBox');
   const bannerBox = document.getElementById('bannerBox');
+  const axeBox = document.getElementById('axeUsedBox');
+  if(axeBox) axeBox.innerHTML = `<b>Axe PM utilisé pour les calculs :</b> ${s.axeA} → ${s.axeB}`;
   if(!data || data.sortedRounds.length===0){
     box.innerHTML = '<p class="small">Aucune donnée à afficher — importez au moins une ronde et désignez un étalon.</p>';
     zBox.innerHTML=''; bannerBox.innerHTML='';
@@ -1384,6 +1488,7 @@ function renderResults(){
   drawBarChart(data, curIdx);
   drawLineChart(data);
   renderPointDiagrams(data);
+  renderPendageTable(data, curIdx);
   window.__lastComputed = data;
 }
 
@@ -1640,6 +1745,10 @@ function generatePDF(){
     y += boxH+5;
   }
 
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(20);
+  doc.text(`Axe PM utilisé pour les calculs : ${s.axeA} → ${s.axeB}`, marginL, y); y+=6;
+  doc.setFont('helvetica','normal');
+
   const body = s.points.map(pt=>{
     const c = data.results[pt][curIdx];
     const prev = prevIdx>=0 ? data.results[pt][prevIdx] : null;
@@ -1738,6 +1847,28 @@ function generatePDF(){
       return [pt, c.mag.toFixed(2), c.dN.toFixed(2), c.dE.toFixed(2), c.dZ.toFixed(2)];
     });
     doc.autoTable({ startY:y+2, head:[['Point','Déplacement (mm)','dN (mm)','dE (mm)','dZ (mm)']], body:refBody, styles:{fontSize:8}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  }
+
+  if(s.pairs && s.pairs.length){
+    doc.addPage(); y=16;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Pendage des paires de points (angle zénithal)', marginL, y); y+=3;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+    doc.text("Angle mesuré depuis la verticale entre chaque point du bas et son point du haut associé (0° = parfaitement à l'aplomb, 90° = horizontal). Le déversement horizontal indiqué est celui entre les deux points/prismes eux-mêmes, non celui de la face du mur (les points ne sont pas nécessairement à égale distance de celle-ci) — l'évolution de cet écart d'une ronde à l'autre demeure toutefois représentative d'un éventuel mouvement du mur. « Écart converti » traduit l'écart angulaire en déplacement linéaire équivalent (mm) à la distance en pente mesurée (distance x tan(écart)).", marginL, y+3.5, {maxWidth:182});
+    doc.setTextColor(20); y+=21;
+    const curRoundPdf = data.sortedRounds[curIdx];
+    const pendageBody = s.pairs.map(pair=>{
+      const basEt = data.ref.points[pair.bas], hautEt = data.ref.points[pair.haut];
+      const basCur = curRoundPdf ? curRoundPdf.points[pair.bas] : null;
+      const hautCur = curRoundPdf ? curRoundPdf.points[pair.haut] : null;
+      const etCalc = computePendage(basEt, hautEt);
+      const curCalc = computePendage(basCur, hautCur);
+      if(!etCalc || !curCalc) return [`${pair.bas} / ${pair.haut}`, '—','—','—','—','—','—'];
+      const deltaDeg = curCalc.zenithDeg - etCalc.zenithDeg;
+      const convertedMM = curCalc.pente * Math.tan(deltaDeg*Math.PI/180) * 1000;
+      return [`${pair.bas} (bas) / ${pair.haut} (haut)`, curCalc.pente.toFixed(3)+' m', toDMS(curCalc.zenithDeg), toDMS(etCalc.zenithDeg), (deltaDeg>=0?'+':'')+toDMS(deltaDeg), (convertedMM>=0?'+':'')+convertedMM.toFixed(1)+' mm', (curCalc.horiz*1000).toFixed(1)+' mm'];
+    });
+    doc.autoTable({ startY:y+2, head:[['Paire (bas / haut)','Dist. en pente','Angle zénithal — courant','Angle zénithal — étalon','Écart','Écart converti','Déversement horiz.']], body:pendageBody, styles:{fontSize:7}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
   }
 
   doc.setFontSize(7.5); doc.setTextColor(120);
