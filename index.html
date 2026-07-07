@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monitoring de structure — HUDL / AN-26-008</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --navy:#1C2B39;
+  --navy-2:#28394A;
+  --paper:#F7F6F2;
+  --card:#FFFFFF;
+  --ink:#22262B;
+  --ink-soft:#5B6570;
+  --line:#DAD6CC;
+  --ok:#2E7D46;
+  --ok-bg:#E7F3EA;
+  --warn:#C98A2B;
+  --warn-bg:#FBF0DD;
+  --danger:#B23A2E;
+  --danger-bg:#FAE7E4;
+  --mono-accent:#3A4552;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:14px;
+}
+.mono{font-family:'IBM Plex Mono',monospace;}
+header.topbar{
+  background:var(--navy);
+  color:#fff;
+  padding:14px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+header.topbar .brand{display:flex;align-items:center;gap:12px;}
+header.topbar .brand svg{flex:none;}
+header.topbar h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.02em;}
+header.topbar .sub{font-size:11.5px;color:#B9C3CC;font-family:'IBM Plex Mono',monospace;}
+header.topbar .meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#DDE3E8;text-align:right;line-height:1.5;}
+nav.tabs{
+  display:flex;
+  gap:2px;
+  background:var(--navy-2);
+  padding:0 24px;
+  overflow-x:auto;
+}
+nav.tabs button{
+  background:transparent;
+  border:none;
+  color:#C7D0D8;
+  padding:12px 16px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+  white-space:nowrap;
+}
+nav.tabs button.active{color:#fff;border-bottom-color:var(--warn);}
+main{max-width:1180px;margin:0 auto;padding:24px;}
+.panel{display:none;}
+.panel.active{display:block;}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:20px;
+  margin-bottom:18px;
+}
+.card h2{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--navy);margin:0 0 4px;}
+.card .hint{color:var(--ink-soft);font-size:12.5px;margin:0 0 14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+@media(max-width:800px){.grid2,.grid3{grid-template-columns:1fr;}}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em;}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:3px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;
+  background:#fff;
+  color:var(--ink);
+}
+textarea{font-family:'IBM Plex Mono',monospace;min-height:140px;resize:vertical;}
+.field{margin-bottom:12px;}
+button.btn{
+  background:var(--navy);
+  color:#fff;
+  border:none;
+  padding:9px 16px;
+  border-radius:3px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:'IBM Plex Sans',sans-serif;
+}
+button.btn:hover{background:var(--navy-2);}
+button.btn.secondary{background:#fff;color:var(--navy);border:1px solid var(--navy);}
+button.btn.warn{background:var(--warn);}
+button.btn.danger{background:var(--danger);}
+button.btn:disabled{opacity:.4;cursor:not-allowed;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.data th,table.data td{
+  padding:6px 8px;
+  border:1px solid var(--line);
+  text-align:right;
+  font-family:'IBM Plex Mono',monospace;
+}
+table.data th{background:var(--navy);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.02em;}
+table.data td.left, table.data th.left{text-align:left;}
+table.data tr.flag-vert td.ec{background:var(--ok-bg);color:var(--ok);font-weight:700;}
+table.data tr.flag-jaune td.ec{background:var(--warn-bg);color:var(--warn);font-weight:700;}
+table.data tr.flag-rouge td.ec{background:var(--danger-bg);color:var(--danger);font-weight:700;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;}
+.badge.ok{background:var(--ok-bg);color:var(--ok);}
+.badge.warn{background:var(--warn-bg);color:var(--warn);}
+.badge.danger{background:var(--danger-bg);color:var(--danger);}
+.banner{padding:12px 16px;border-radius:4px;font-weight:600;margin-bottom:16px;font-size:13.5px;}
+.banner.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #BFE0C8;}
+.banner.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #EBD3A2;}
+.banner.danger{background:var(--danger-bg);color:var(--danger);border:1px solid #E9BEB8;}
+.pending{background:#FBF0DD;border:1px solid #EBD3A2;border-radius:4px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;}
+.pending strong{color:var(--warn);}
+.rowline{display:flex;gap:10px;align-items:end;flex-wrap:wrap;}
+.rowline > *{flex:1;min-width:140px;}
+.small{font-size:11.5px;color:var(--ink-soft);}
+.list-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;border:1px solid var(--line);border-radius:3px;margin-bottom:6px;background:#fff;
+}
+.list-item .txt{font-size:12.5px;}
+.list-item .txt b{font-family:'IBM Plex Mono',monospace;}
+.icon-x{cursor:pointer;color:var(--danger);font-weight:700;background:none;border:none;font-size:14px;}
+canvas{max-width:100%;background:#fff;}
+.footer-note{font-size:11px;color:var(--ink-soft);text-align:center;margin-top:24px;padding-top:14px;border-top:1px solid var(--line);}
+.trend-up::after{content:" ↑";color:var(--danger);}
+.trend-down::after{content:" ↓";color:var(--ok);}
+.trend-flat::after{content:" →";color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img id="logoImg" src="" alt="Logo" style="height:36px;width:auto;border-radius:4px;background:#fff;padding:2px;">
+    <div>
+      <h1>Monitoring de structure</h1>
+      <div class="sub" id="headerSub">Client HUDL — Projet AN-26-008</div>
+    </div>
+  </div>
+  <div class="meta" style="display:flex;align-items:center;gap:8px;">
+    <label style="color:#B9C3CC;font-size:11px;text-transform:uppercase;margin:0;">Structure</label>
+    <select id="structureSwitcher" onchange="switchStructure(this.value)" style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:5px 8px;"></select>
+    <button class="btn secondary" style="padding:5px 10px;font-size:12px;" onclick="addStructure()">+ Nouvelle</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="config">Configuration</button>
+  <button class="tab-btn" data-tab="import">Import de données</button>
+  <button class="tab-btn" data-tab="rondes">Rondes</button>
+  <button class="tab-btn" data-tab="etalon">Étalon</button>
+  <button class="tab-btn" data-tab="resultats">Résultats</button>
+  <button class="tab-btn" data-tab="export">Rapport PDF</button>
+</nav>
+
+<main>
+
+<!-- CONFIGURATION -->
+<div class="panel active" id="panel-config">
+  <div class="card" style="background:#F2F6FB;border-color:#C9D8E8;">
+    <h2 style="color:#1C2B39;">📘 Mode d'emploi — travail d'équipe</h2>
+    <p class="hint" style="margin-bottom:10px;">
+      <b>Cette application ne partage rien automatiquement entre appareils.</b> Chaque personne qui ouvre ce fichier a sa propre copie locale des données, même si le fichier est sur un dossier partagé (OneDrive, etc.). Voici comment travailler correctement en équipe :
+    </p>
+    <div class="small" style="line-height:1.7;">
+      <b>1. Un seul poste de saisie officiel.</b> Une personne désignée importe les rondes de terrain (onglet Import de données) et tient le fichier à jour.<br>
+      <b>2. Partager les données à jour avec l'équipe :</b> après chaque mise à jour, cliquez <i>« Exporter la session (JSON) »</i> ci-dessous et déposez ce fichier sur OneDrive. Les autres membres cliquent <i>« Importer une session »</i> pour voir les mêmes données.<br>
+      <b>3. Diffuser aux tiers (lecture seule) :</b> cliquez <i>« Générer la version consultation (index.html) »</i> ci-dessous et déposez ce fichier sur votre dépôt GitHub Pages. À refaire après chaque mise à jour.<br>
+      <b>4. Sauvegarde :</b> le JSON exporté est aussi votre historique/sauvegarde — gardez les anciennes versions si vous voulez pouvoir revenir en arrière.
+    </div>
+  </div>
+  <div class="card">
+    <h2>Identification du projet</h2>
+    <p class="hint">Apparaît en en-tête du rapport.</p>
+    <div class="grid3">
+      <div class="field"><label>Client</label><input type="text" id="cfgClient" value="HUDL"></div>
+      <div class="field"><label>No de projet</label><input type="text" id="cfgProjet" value="AN-26-008"></div>
+      <div class="field"><label>Responsable</label><input type="text" id="cfgResp" value="Arpent-Nord Construction"></div>
+      <div class="field"><label>Système de coordonnées</label><input type="text" id="cfgSys" value="SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28"></div>
+      <div class="field"><label>Facteur d'échelle (FC)</label><input type="number" step="0.0000001" id="cfgFC" value="1"></div>
+      <div class="field"><label>Décimales affichées (coordonnées N/E/Z)</label><input type="number" step="1" min="0" max="6" id="cfgDecimals" value="3">
+        <div class="small">3 par défaut. Change l'affichage seulement, jamais le calcul.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Structures à monitorer</h2>
+    <p class="hint">Un même mandat peut couvrir plusieurs structures distinctes (ex. deux ponts). Chacune a ses propres points, axe, tolérances, rondes et étalon. Un seul rapport PDF est généré à la fois, pour la structure active.</p>
+    <div id="structuresList"></div>
+    <div class="rowline">
+      <input type="text" id="newStructureName" placeholder="ex. PONT P-20621 RIVIÈRE CHASSÉ">
+      <button class="btn secondary" onclick="addStructure()">+ Ajouter une structure</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tolérances et axe PM</h2>
+    <div class="grid3">
+      <div class="field"><label>Seuil jaune — EC (mm)</label><input type="number" step="0.1" id="cfgJaune" value="2.0"></div>
+      <div class="field"><label>Seuil rouge — EC (mm)</label><input type="number" step="0.1" id="cfgRouge" value="3.0"></div>
+      <div class="field"><label>Seuil de stabilité tendance (mm)</label><input type="number" step="0.05" id="cfgTrendEps" value="0.15">
+        <div class="small">Écart entre 2 rondes en-deçà de cette valeur = tendance stable (→).</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Point origine de l'axe PM</label><select id="cfgAxeA"></select></div>
+      <div class="field"><label>Point extrémité de l'axe PM</label><select id="cfgAxeB"></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Points de monitoring (nom canonique)</h2>
+    <p class="hint">Ces noms correspondent à la <b>valeur étalon</b> telle que désignée au réseau (ex. <b>101</b>) — à ne pas confondre avec les codes de mesure du terrain (ex. <span class="mono">MON101</span> ou <span class="mono">101MON</span>), où MON est un simple marqueur ajouté par l'opérateur pour indiquer « valeur mesurée du moment », associé à ce nom à l'étape d'import.</p>
+    <div id="pointsList"></div>
+    <div class="rowline">
+      <input type="text" id="newPointName" placeholder="ex. 101">
+      <button class="btn secondary" onclick="addPoint()">+ Ajouter un point</button>
+      <button class="btn secondary" onclick="resetDefaultPoints()">↺ Réinitialiser aux noms par défaut</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Points de référence (réseau stable)</h2>
+    <p class="hint">Points ancrés sur une structure stable, distincts des points de monitoring. Leur stabilité est vérifiée à chaque ronde : un déplacement sur un point de référence remet en question la fiabilité des mesures de la structure surveillée plutôt que de signaler un mouvement réel de celle-ci.</p>
+    <div id="refPointsList"></div>
+    <div class="rowline">
+      <input type="text" id="newRefPointName" placeholder="ex. REF1">
+      <button class="btn secondary" onclick="addRefPoint()">+ Ajouter un point de référence</button>
+      <button class="btn secondary" onclick="resetDefaultRefPoints()">↺ Réinitialiser aux noms par défaut</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Paires de points (pendage)</h2>
+    <p class="hint">Associez un point du bas à son point du haut (ex. 101 / 111) pour calculer automatiquement l'angle de pendage entre les deux, exprimé en angle zénithal (DMS). Utile pour détecter une bascule progressive d'un mur ou d'une structure verticale.</p>
+    <div id="pairsList"></div>
+    <div class="rowline">
+      <div class="field"><label>Point du bas</label><select id="newPairBas"></select></div>
+      <div class="field"><label>Point du haut</label><select id="newPairHaut"></select></div>
+      <button class="btn secondary" onclick="addPair()">+ Ajouter la paire</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Instruments</h2>
+    <p class="hint">Fabricant — modèle — no série — certificat d'étalonnage. Choisi ou créé à chaque import.</p>
+    <div id="instrList"></div>
+    <div class="grid3">
+      <div class="field"><label>Fabricant</label><input type="text" id="newInstFab" placeholder="ex. Leica"></div>
+      <div class="field"><label>Modèle</label><input type="text" id="newInstMod" placeholder="ex. MS60"></div>
+      <div class="field"><label>No série</label><input type="text" id="newInstSer" placeholder="ex. 123456"></div>
+    </div>
+    <div class="field"><label>Certificat d'étalonnage (réf / date)</label><input type="text" id="newInstCal" placeholder="ex. Cert. 2026-05-01"></div>
+    <button class="btn secondary" onclick="addInstrument()">+ Ajouter l'instrument</button>
+  </div>
+
+  <div class="card">
+    <h2>Sauvegarde de session</h2>
+    <p class="hint">Aucune donnée n'est conservée automatiquement entre deux visites. Exportez un fichier JSON pour reprendre plus tard.</p>
+    <button class="btn secondary" onclick="exportSession()">Exporter la session (JSON)</button>
+    <label style="display:inline-block;margin-left:10px;">
+      <span class="btn secondary" style="display:inline-block;">Importer une session</span>
+      <input type="file" accept=".json" style="display:none" onchange="importSession(event)">
+    </label>
+  </div>
+
+  <div class="card">
+    <h2>Version consultation (GitHub)</h2>
+    <p class="hint">Génère une copie autonome (fichier <span class="mono">index.html</span>) de l'application, verrouillée en lecture seule et contenant un instantané des données actuelles de <b>toutes les structures</b>. À déposer sur votre dépôt GitHub Pages pour que des tiers puissent consulter les rapports et analyses, sans pouvoir rien modifier. Cette copie remplace celle déjà en ligne : à régénérer et re-déposer après chaque mise à jour.</p>
+    <button class="btn secondary" onclick="exportConsultationVersion()">📤 Générer la version consultation (index.html)</button>
+    <div class="small" id="exportConsultStatus" style="margin-top:6px;"></div>
+  </div>
+</div>
+
+<!-- IMPORT -->
+<div class="panel" id="panel-import">
+  <div class="card">
+    <h2>Import d'un fichier brut de terrain</h2>
+    <p class="hint">
+      Format attendu : <b>Point, Nord, Est, Z</b> (PNEZ) — ou <b>Point, Est, Nord, Z</b> (PENZ) selon l'export de votre logiciel. Le point est toujours le premier élément de la ligne.
+      Convention : CODE = numéro + suffixe (ex. <span class="mono">101MON</span> = point 101, mesure courante).
+    </p>
+    <div class="grid3">
+      <div class="field"><label>Date de la ronde</label><input type="date" id="importDate"></div>
+      <div class="field"><label>Instrument utilisé</label><select id="importInstrument"></select></div>
+      <div class="field"><label>Opérateur</label><input type="text" id="importOperateur" placeholder="Arpent-Nord Construction"></div>
+    </div>
+    <div class="field"><label>Ordre des colonnes</label>
+      <select id="importColOrder"><option value="PNEZ">PNEZ — Point, Nord, Est, Z</option><option value="PENZ">PENZ — Point, Est, Nord, Z</option></select>
+    </div>
+    <div class="field">
+      <label>Fichier</label>
+      <label class="btn secondary" style="display:inline-block;">Choisir un fichier…
+        <input type="file" accept=".txt,.csv" style="display:none" onchange="fileToViewer(this.files[0], 'rawInput', 'importLineViewer')">
+      </label>
+      <span class="small">ou collez le contenu directement ci-dessous</span>
+    </div>
+    <div class="field"><label>Contenu du fichier</label><textarea id="rawInput" oninput="syncViewerFromTextarea('rawInput','importLineViewer')" placeholder="101MON, 5146869.084, 264473.154, 163.967&#10;111MON, 5146869.010, 264473.316, 165.975&#10;...">
+</textarea></div>
+    <div class="field" id="importLineViewerWrap" style="display:none;">
+      <label>Lignes détectées — retirez celles qui sont inutiles</label>
+      <div id="importLineViewer" style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:3px;padding:8px;"></div>
+    </div>
+    <button class="btn" onclick="parseRaw()">Analyser le fichier</button>
+    <span class="small" id="parseSummary"></span>
+  </div>
+
+  <div class="card" id="mappingCard" style="display:none;">
+    <h2>Correspondance des points détectés</h2>
+    <p class="hint">Associez chaque code brut détecté à un point canonique. Les correspondances déjà connues sont proposées automatiquement.</p>
+    <div id="mappingList"></div>
+    <div class="pending" id="anomalyBox" style="display:none;"></div>
+    <button class="btn" onclick="commitRound()">Créer la ronde avec ces valeurs</button>
+  </div>
+</div>
+
+<!-- RONDES -->
+<div class="panel" id="panel-rondes">
+  <div class="card">
+    <h2>Historique des rondes</h2>
+    <p class="hint">Désignez la ronde étalon de référence. Ajoutez une note libre pour signaler tout élément pouvant affecter les mesures (génératrice, source de chaleur, etc.).</p>
+    <div id="rondesList"></div>
+  </div>
+</div>
+
+<!-- ÉTALON -->
+<div class="panel" id="panel-etalon">
+  <div class="card">
+    <h2>Importer un levé de coordonnées étalon</h2>
+    <p class="hint">
+      Format attendu : <b>Point, Nord, Est, Z</b> (PNEZ) ou <b>Point, Est, Nord, Z</b> (PENZ) — le point est le premier élément. Une 5<sup>e</sup> colonne d'étiquette est optionnelle.
+      Sans étiquette, le nom canonique retenu est le code lui-même. Si une étiquette est présente et commence par <span class="mono">REF</span>, le point est classé comme référence ;
+      sinon son préfixe/suffixe <span class="mono">MON</span> (marqueur « valeur mesurée ») est retiré pour obtenir le nom canonique.
+    </p>
+    <div class="grid3">
+      <div class="field"><label>Date du levé</label><input type="date" id="etalonImportDate"></div>
+      <div class="field"><label>Instrument utilisé</label><select id="etalonImportInstrument"></select></div>
+      <div class="field"><label>Opérateur</label><input type="text" id="etalonImportOperateur" placeholder="Arpent-Nord Construction"></div>
+    </div>
+    <div class="field"><label>Ordre des colonnes</label>
+      <select id="etalonColOrder"><option value="PNEZ">PNEZ — Point, Nord, Est, Z</option><option value="PENZ">PENZ — Point, Est, Nord, Z</option></select>
+    </div>
+    <div class="field">
+      <label>Fichier</label>
+      <label class="btn secondary" style="display:inline-block;">Choisir un fichier…
+        <input type="file" accept=".txt,.csv" style="display:none" onchange="fileToViewer(this.files[0], 'etalonRawInput', 'etalonLineViewer')">
+      </label>
+      <span class="small">ou collez le contenu directement ci-dessous</span>
+    </div>
+    <div class="field"><label>Contenu du fichier</label><textarea id="etalonRawInput" oninput="syncViewerFromTextarea('etalonRawInput','etalonLineViewer')" placeholder="51,5146819.350,264447.582,162.698&#10;101,5146869.087,264473.157,163.966&#10;..."></textarea></div>
+    <div class="field" id="etalonLineViewerWrap" style="display:none;">
+      <label>Lignes détectées — retirez celles qui sont inutiles</label>
+      <div id="etalonLineViewer" style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:3px;padding:8px;"></div>
+    </div>
+    <button class="btn" onclick="analyzeEtalonFile()">Analyser</button>
+    <span class="small" id="etalonImportSummary"></span>
+  </div>
+
+  <div class="card" id="etalonClassifyCard" style="display:none;">
+    <h2>Vérifier la classification des points</h2>
+    <p class="hint">Nom canonique et rôle proposés automatiquement (selon les correspondances déjà connues). Ajustez au besoin avant de confirmer.</p>
+    <div id="etalonClassifyList"></div>
+    <button class="btn" onclick="confirmEtalonImport()">Confirmer et définir comme étalon</button>
+  </div>
+
+  <div class="card">
+    <h2>Ronde étalon de référence</h2>
+    <p class="hint">Toutes les valeurs EC/PM du rapport sont calculées par rapport à ces coordonnées. Vérifiez-les avant de poursuivre le monitoring.</p>
+    <div id="etalonInfoBox"></div>
+    <div class="pending" style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="etalonLockCheckbox" onchange="toggleEtalonLock(this.checked)" style="width:auto;">
+      <label for="etalonLockCheckbox" style="margin:0;text-transform:none;font-size:13px;">
+        <strong>Valeurs étalons vérifiées — verrouiller.</strong> Une fois cochée, aucun import ni changement de ronde étalon n'est possible sans décocher explicitement.
+      </label>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Points de monitoring — coordonnées étalon</h2>
+    <div id="etalonMonBox"></div>
+  </div>
+  <div class="card">
+    <h2>Points de référence — coordonnées étalon</h2>
+    <div id="etalonRefBox"></div>
+  </div>
+  <div class="card">
+    <h2>Axe PM</h2>
+    <div id="etalonAxeBox"></div>
+  </div>
+</div>
+
+<!-- RESULTATS -->
+<div class="panel" id="panel-resultats">
+  <div class="card">
+    <h2>Ronde à afficher</h2>
+    <p class="hint">Par défaut, la dernière ronde de mesure. Choisissez une ronde antérieure pour revoir ou regénérer un rapport rétroactivement.</p>
+    <select id="viewRoundSelectResultats" onchange="setViewRound(this.value)"></select>
+  </div>
+  <div class="card">
+    <h2>Tableau comparatif PM / EC</h2>
+    <p class="hint">EC = écart perpendiculaire à l'axe (colonne critique). PM = déplacement longitudinal. « vs préc. » = valeur de ce point à la ronde précédente (vs étalon), pour comparaison — non cumulative : la valeur EC init demeure la référence à considérer en premier.</p>
+    <p class="small" id="axeUsedBox" style="margin-bottom:10px;"></p>
+    <div id="bannerBox"></div>
+    <div id="resultsTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Stabilité des points de référence</h2>
+    <p class="hint">Points ancrés sur une structure stable. Un déplacement ici remet en question la fiabilité de la ronde plutôt que d'indiquer un mouvement réel de la structure surveillée.</p>
+    <div id="refTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Tableau Z — Déplacements verticaux vs étalon (mm)</h2>
+    <div id="zTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Écart EC par point — ronde courante</h2>
+    <canvas id="chartBar" width="900" height="320"></canvas>
+  </div>
+  <div class="card">
+    <h2>Évolution temporelle EC</h2>
+    <p class="hint">Suivi de l'écart EC (perpendiculaire à l'axe) de chaque point, ronde après ronde, par rapport à l'étalon. Utile pour repérer une dérive progressive dans le temps plutôt qu'un simple écart ponctuel. Les lignes pointillées orange/rouge indiquent les seuils de tolérance.</p>
+    <canvas id="chartLine" width="900" height="320"></canvas>
+  </div>
+  <div class="card">
+    <h2>Diagrammes de déplacement PM / EC par point</h2>
+    <p class="hint">Centre = étalon de référence. Ligne verte = axe PM. Cercles = seuils de tolérance (jaune/rouge). Points numérotés par ordre chronologique des rondes.</p>
+    <div id="pointDiagramsBox" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"></div>
+  </div>
+  <div class="card">
+    <h2>Pendage des paires de points (angle zénithal)</h2>
+    <p class="hint">Angle mesuré depuis la verticale (0° = parfaitement à l'aplomb, 90° = horizontal) entre chaque point du bas et son point du haut associé. <b>Le déversement horizontal indiqué est celui mesuré entre les deux points/prismes eux-mêmes, pas nécessairement celui de la face du mur</b> — les points d'observation ne sont pas nécessairement à égale distance du mur, et il n'est ni pratique ni nécessaire de les y positionner avec cette précision. L'évolution de cet écart d'une ronde à l'autre (comparé à l'étalon) demeure néanmoins représentative d'un éventuel mouvement du mur. <b>« Écart converti »</b> traduit l'écart angulaire en un déplacement linéaire équivalent (mm) à la distance en pente mesurée entre les deux points (distance × tan(écart)) — ex. un écart de 1'30" sur 5 m de distance en pente représente environ 2,2 mm. Configurez les paires dans l'onglet Configuration. Aucune paire configurée = section vide.</p>
+    <div id="pendageTableBox"></div>
+  </div>
+</div>
+
+<!-- EXPORT -->
+<div class="panel" id="panel-export">
+  <div class="card">
+    <h2>Générer le rapport PDF</h2>
+    <p class="hint">Reprend l'en-tête, le tableau comparatif, le tableau Z, les graphiques et l'historique des rondes avec notes.</p>
+    <div class="field"><label>Ronde à inclure dans le rapport</label>
+      <select id="viewRoundSelectExport" onchange="setViewRound(this.value)"></select>
+    </div>
+    <button class="btn" onclick="generatePDF()">Générer le PDF</button>
+    <p class="small" id="pdfStatus"></p>
+  </div>
+</div>
+
+</main>
+<div class="footer-note">Application de monitoring — moteur de calcul EC/PM — session locale (aucune donnée envoyée à un serveur)</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+/* ---------------- STATE ---------------- */
+const LOGO_B64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJ0AAAB2CAYAAADSpZGXAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAADlQSURBVHhe7Z13l1zFue7Px7lr3X/OuvcaHI6PA8HHNiYYY4JNENhgk8EGbIHARGFAIIQCkgAFBAiQAMWRNMo5jEaTNVmTRxppclKCuuv37n52V9d0z/QojmD2Ws/q7t3dO1Q99eaq/R9ufBvfLvD2H+GO8W18O9/bOOnGtwu+jZNufLvg2zjpvO2bb7654PgubuOk87aQEBcC2WzHT3/jVrYMus7jX4dfXZLbd5J0YcePRbC1Dpx2z5f3ulv2dbrDA6fD27hkt2816cKOzBZff/11Rpw+fTorhP8LEZ4zxIOF3e62fZ2GLa2Dtu/bsn1rSBd22nAICRAS5vSpU+cfaUha2HnCPVzY7f6Q1xnj3ereIdfv41Lcxkk3BkhX3HXCPV7c7e7c32m4I6/T/TGv0/0pv2vItYe4FLdLlnRh46dDRmKFBDh1yp06eTLGyZMnDCdOHB8Rx48Pxgi/C6HjAs7Tf/yke/Fgj5Hs7v0RJiSIh1rtOp5U0+G9pcOlso2T7iKQbuD4Cbegrs/9Ob/T3Zvf6f56IHr9U4JwSLnw+sN7S4dLZbvkSBc2tI8hJMtArHSEgjSDgwMRBvpjDPT3xejv6x0V/P/qeB19g+6+BMEeONDpHkxApEPqPVXSbdeZcv2e7ZcNCcfyNuZJFzZmtiRLRy5JJBHLJ1Nfb0+M3p4u19Pd6bq7Ojy0G7o6j2UF/T5Ch+vq6nRTyyOi/a2wy/09Ad4/VNBlUg/1OrWiJ75WX0JmIqGIGLbNWCbgmCVd2HAh2TKRTETzySWC+cRKJVW76+w4GqP92BF37OjhCG2thqNHWlzb4eZRgf+A/U1tJskeKYhINrGoy/2zqMs9VRQRD9JJtR4fHLDr8yUl1y8S+jZhChGzkIJjZRtTpAsbKSRaSLa0JEsQTdILcolgkkIQyycUBDnS2uRaWxoMLc31rqWpzjU3HnJNDbWGxvoa11BXPSrw/6klh92jBRHJni3pdv8q6XbPlXTbe/ZBOmw6CLewussIz/VF0jIaFEhe7sVX074dOUQSjnHpN06680S61pZGN7M8stcgGER7qbTbvVzW7V4ojT5DOiQfUvCe/Z2us+PYOOku1BY2iE+00OP0bbV0JAO+yvTVpNSeiAWpgIhSV1tpOFRd7mqry11NZZmrriiNUVVeEqPyYHFG5FXXuycKOkyKvVja7V4/2OPeSOC1gz1GPiSeVCthkq7O9ojszfXucEujXaeuvaO9LSYhBBQJgZFwcGCI6vXtvkwEvFjbRSVd2AhDyOZ5nL5DENpokSRL2mV0FJ1G56kjkVY+uSAWpAIiUXlpoeFgSYErLcp3pYX7XXFBnqtoanU7Gtrd5qY+t7Khzy1v6HdL6yN8Ud/vltT3u08ORUCCQSZINbmsx71d0eumV/a6GZW9bmpFr5tSHpEO6YeNh2pd39DtaqoO2jWB+kNVsXoGDBIjYVurEVAkFBFjKZgYhCJgLPmykH4XcrsopAtvOIVoHtlouNjjTKgVSTQa2zf8MdghmRGtqc7UIZ2njhS5AMQqKz5gpDJiHdjnCvP3usLCA27foVa3rrHXfVnf7xYniJQNPqvrd48VRs4BhEKivVne42ZW9rp3q/oMEBDSIf2eKU56rRtaj7tVTQMut3nAbWvpdcUtHa66ptKkLWCQiIQyASS1GWC0gcjnE9D3fkW+4ZyNC7V9t0lXVub2N3e43KY+k1ohkQTIB6mW1PW7T739HyewuK7fTSzuNq/01QTZINkHNX1ufk2fm1fT5+ZUJ0mHFIScEG5uVa/7qmHAfV43lMQ5zYNue2u/Kz/SPU66s9nCG40J56mC2GbzYmmyZUQ2qVAg9QnJANIBGwyViaoEJYX7XRHSrKLK7WjudisaMksyiMV3i2r7jTCzqyKgJrHLIBZAfb5X22eOAJILtflORa9JN/73YW2/AeK9V91n30E6JCEq+J78Tre0fsB9VBuRF+KvahxwyxoG3Bf1AynXxO82tAy4kiPdJvkYVIB798nnEzAOuSQImM7ZSEfA871dMNKFN5ZOssU22+BAbLPJg/PtNTxNpFlso9VUmCSTIY8UwxZDZebv3enyiwrdrqZOt6YptSNDIJnerogkFaTC08RGg1AAb/Pxwi4LgQDeE1+bVNxt/8Fug2AQDckFPq3rdwtq+tz7CUmH2uU4qNadx04YGXV+SM7vIC2vkBHyfdkwkGI3sm/3kQFX1dxq904biHw+AeW5y+HwnQ0Rbzhb73xt55V04U2kEC6QbL4K9dWnPDiI5pMNlemrS2wzs8sSRNu7c6vbV9Po1jZGqiokGJKFVzoWskCup4uTmQJIRbjjL4n0FMDLVAXI02U9FuaAeK+URbYbBNJxcTAA5xbp3irvNemoMMmjhV1xhuK18l77ncj3TmWv+3dCVYNZVb32HQSEyLoPpN/Btq6YfD4BMTsAThZagoHsh1r8AHMm4p0P8p030oUXLgwn2ZIqtN0aS6oTqEFFNoiGNAMH9u1y+3Ztc7u2bYrQ2OHWNg/GHeOrUaky3kMSOhYijES6x8gmFOF19riXynrcfYn4G9IQ0i5MHBeiLW8YcCsbB+wVlcl3nIvQCfYcHivEEbHAMyXdblJJt3ujvMctrI3Ix7VCNpEOUnK8tU0DbjXHb0xKbu635EiPmRWoX8wN2X94vZJ8ygv7Nl8YYgn77FwT71tDuvwDeW53S7dJAnWEJBxkmF8TqS5JksllyTgZgFzkPu/L73JPFHW7F8p63DuVfe79hPQRFtb0mWSCoNhnEA51ChkgGYRY1xS9QgxICFmwCbH5+B92Gzaaf1wf2INzPak5r7rPvVwaqXukpWxMiMs5VntmA++r2rq+e6TzL1bGajr7LZ06NZXa1mqNhaGM2gAK0IpsEA0VCrDXZHhDNDrf9zLpQKQN7yHAcyWRjQbpkDCotllVkS2WQjBTc31m3z1b2uMeL+oyYmKTEfbAsUCC0fkrGgbMZlzfPGiAeHyGdNh5eLNkIiDskuZBN6U8Upfsf7Sw2yqGXyzrsf0zq1KJLnCcWZV9bo5HupxG7Lvjbsfh4+bt6rdbDw+62paWSN021dkAJr4nGzkOLCdsvdDJGCddBtLtOXQ4VjF0AF6fVClSgs6BMHQs+yAJoYoXSpFiUaf7BJtW2esmlfa4hwq7zG67fk9HjHvyo0Duk0VdpiZxCvgP50OVbmoZdFtaBt3W1kG3rXXQbWgeNGkH6XBQ8Fwh65/yozJ0jvl8aY+dG8L/fm+Hu3Fvh/tdAjfv63R/LehyT5d0u2kVvbHUExhI2JGQT/sg4ObWwVjaMwDzjvR/u0kXXmhIttBpUFyJRpA6NZXaVGehD6L0yhIQ8gCmSkvL3ObWpErJaYpsJ3UMnTz5YKTKRC7iZMDvOKTKU8Xd5iD4BAtx675Od/v+iHDYfpCXzoZwEB2pBtmQNsLmlkjaQTrOSzYCKcerf+zHCrtj4t20N/W8N+yJiAgYBK+VRyQNCcj96poYfAAVLvNiY+ugO9QaOWNyzDBh1P4+8XxVG/bnudrOGenCC4wJ55FNhJP9plQOjUBQV7EnJBt2G6koeaR5u7cb9jZ1xIFUVOqiWtRi0vBWSILswIyExycgmSYf7HEPFHQNIVYmQDhIKS8Vm0peJpIltzki2562425vW/SKukPqQTo6HkJgzxHjuzfNuYcjng9IiDPDfYA3yqMUm39/SHccD4jOQPwyYXYg/crbupN23tHDcfvTFyKeL/XSxfHOxXZOSDcc4XxnQQ4DBi1qVPVmchSQbJJuqFBCH7u3b45woCCOs9GRqBHsKJwC9vGK2nuhpNvUjjoCqfB6ea91LBKDjgs7czjctLfTPFk5DqhqjklnokKRcHuOHHd5R0+4/UdP2CvEg3SoV65VWYi5NX1Dji/4xAu/E7h2VO9fDnTFNuq/SqPsxpvlkbq3wYftmnBuUPs5TZGtx2A9cHTA2loOBoB4w6nbkHhnS76zIl14ISn2W4JwIpu8JtluUqMAFx97TdkDJBshkO2bN7gNa3PczurmWFXQ2Z/XJ4Ou7OOVjvXtG4gBEW/ZN7TzsgVeLWETVCq2IWqM42LDIcV2IuGOHHf5x064wvYIB46dcPs80kEEJCTEyD183OxGH0jeZ0oiQDiu/a2KXnfvgaESUYB8SF+RDLuPz8T8CL9wnWoDCIiDpAHA/n1tEfEUGfCJ56tb38YLiXc225gn3ebGyI6Ro0CDQjCFPyCcyAcgh2y34TpuJPytuNsCwdhxHBNHAPWNtKADIRWEg2AFx0644vYIvEfiYdOhfulwVCsEnl3dZ0QTubIFv+d/EBOJeFfCBuVVxEPtMoNMs8qeK03G+xh8mCBrGqPsBvsIKl/ypAudBuy3kGwADwrCkbxW/ZrsN5wEsHv7Frdjxw6X25yQbhZkHbAAKbEqCMB+GdR0LI2MB/hkcaSm8AxDImUCdhQEpVOxkz6o6TdPFTuO8ymXSmKeuNj21kGz2yThSjtOuvLOCEXtkYqFdPyWkAo25nBqU+Aa7j/QZfeDhHq+LLoeCBcSUWRkQESk6jdpx70ABgz3gH0nE4RBg9Ml4m0/PJhUtQnnQg4GfRemzEIhc6bbGZMuvIDQacBhCMnmE44gr3Klst92bt1k2Lpzp3lfNAw5R9WioeboBDU6DU2IQyqUxlb0fziDnJAFEgPV5uc+BaSSPNVQwkEmbDbUaEnHSXew86Sr6DrpqrpOusqukybtIB32HvFC/k81ybRh7LkQkI/rgGzhdfuDI7x2BiGxPn4jj5egNybCbM+pwjxQcLrgWJJ4ybRZh/WdUmaZUmVnup0R6ULCmZRL46HiMPhkA0TKIVxFWVGcUdi/Z4fbsWWjW79mtdu0fbt1Fg2COoVYEI64mG+zse/OvM44pECnQCK+C71TCJiJZEgL9ktt/X5fNB2QFBe2GNKV0AjXBJGQcpAKCQfhIFp19ylX033KXiEi6pXfIhmRNJBVsblsoRge1xV+54N7434JYvv3xeDDgSIADvGQtn5sknpBSbz9bX0WNVB+G/NHHm2Kqk0j7c6EfGOKdJu374gJR4cRgSfMQMpK9gmj+fGibgue+p4oncr3kg58RtWG9hOf6VA6KpSGBICRCnQQnjBSCtIjGQiN7DoShUUgVlnnSSNabc8pV997ytX1RO9FOoiGdEQ9l/ScGkKWkSCpDcLrzAQNOqSgf9/YwS+W9riJxVGcUGYJ3i3OBaho6740SBc7DmEudaDfLloOg1Sq1KoR7sC+OPa2bdN6t3HbthQJB+HU8SIbrxjMYWP7DY568RtcsTkkxkidR0wOyYCUIx5HeAQp56tV7DipVIgGGvtOuYbeJOmQhDgRnJ9Qyfv1/UPOlQ0URkGdht+lA/eHJOeetQAPOWQ5GwwgNMbU8h5rX/YpjreiccA1tTRZHxHGSnEsEvadVOzZqtlRk84/me84hGktLpqLF9mUzpINB9m2bsw1bN6y2a1tTtpwNMhb5T1mvLNPSXcyCOka+u9FUecINDzSbDTeK4TDliM/inTFO1Z4hLQWUg7PFFKhRiFbU99p19x32rX2n7b37MORwKNlAOFVYxs+Vpx+oGQDkWikASPIHkTa+fsZrAql4FiQWlP7qlZvd9ugZYKSjkVkj6O14thdhqKA0WxnTDpJON9TTaa12u2iccd9DxVInSLd1q1eadjYFEkzSThUKd4b+8gwqALXj7kxipFgGsUAuya057LB/YkqE6Qc50MacB2oHeJxEA4iQTg8VMiFZINsgAULIR1qFkdCpKOTIXJ4vtFgtNIOyNnyBx12L21GMFmmCm2qXDUhKcyBg0c6zb5DOykXHkq7s3UqsiadfwKFR5SrYxQwGjQy8IBIa+EVKVGvSTB4qcTfINuypUvczvpjdtOktJAMyiYwGp8ppl4tUptSqzSkH0JAlUIQJFPY+NmCzmB+A5UjqtolZ4qU8x0HnIZDCQnX0n/aHRk47doS4DOkQ9KhhrGXOA7EC883WkjahfszIbRvBXm0DAQqa9SGfkUOeVo0ksXv4jxtUtqJdOmkXbbku6ik25RfZKMLicJIU3UshEPqsD6bGi8kG1KOfXicfB5NXM4HtXNMBSSAi6cplUOMjRQSBIJIOA4QDvsN6QbRjg1+7dqPf22v7OM7STpIhz26uGlwyDlHC8UeR/JkfcjGDU0M1LQCyNiuknpAUq+irWeMks7PqybsOIljeankUZVlUOCXOByhkeVfLHXLGqKb3NAymCxYrOlzz5ZE6k6j0XcMaEw//KDQgqL0owF2HMeSWiV5rvkNeKtkHZByqFWkHJIMGw4Jd3TwtBGuIwGpWAhK4Jj7gcSTA2lzJoAo3GNopw0HSbvwPz7puG8qlcOqFfoDgSEnMFSxZ+tUXDTSbW2IGoV6OFWNQLhHC6Jg5l8TBnEmsgkQEvUT7s8GLCBNvlJqFVWIhEKtQjjIg1ol8ItnCqkgF5KNlc67Tnztuk9ErxBR6hUbUDnXdFUlZwJJrnRtkAmy7fz/EGbSWsZkLJB2mlDkt3f1sZ6LR7pQfPqqVRFrZR4kjs2BqKmw0IhKk0htgU25a9ymXXuNaHhNftKeejPSN8xDIAvAfkiVqaE1mumQ8LuRABmY+0CqizkS5GshCg4A1SyUKxGTQ13KW0WFQi4kmwjXczJ6Rd3iXIh0dCKzxMLznilwkLhXVG34XSZk+o8C6irZQsoDX+LtbRuMy6Awl4i5+uVPUrGhms1mOzPSBSESxeQUXJQtR9GlYnFbNuQaclYsc+uaohvDeeBGASmnBw8kI+vsQ/KFDZmuUc/EY/393qjBGel4q1KrxOSw5SAcIRLF45ByUqkiW9+pb1z/qW9c78mIdNh0kI4QCyQmjxqe92zAoAjV5UjgP2He9wc33e7+83//L3fd/HUm7Wh7QC2e7DqC81o8iNAXEYkhqbE0pMuGeMOSLjwY8KWcn8w3CZeoGiEATE0c6pRMA1B4ZHtxeXxTGlUY3EgbzVG459Xp1ihC2JCC7LlMkjAT8OCwaaiRI2OAAwPhCNmQvoI0BIGRcqhWJBi2HGoVKQfhIBqEG0iQrqi6zpW3dhjp8HgJLNOh4bn/309/Ht/XFa/NS/ku035B6jLcPxyklv043/+57Ht2nps3N6SQjjQjbaB+qT7abXE7nEJfxZ5t+CRr0kl/p4vLScppxpbicUya2bx+rWHlV18achqiRiAkwasWmOE9pPvLjkZ3WaJRRiId3uyZ2HO350V2o18JTGMj5awK+MjxuHIEj1XOA3YchBPZeJLNqtU57uabbrTrhHQ4HZCO+3rl4FCp5N/Xj+66P95/zcqSeP8v5q0d8j8gLzb0SIeD4nzSBjoPxJNTQdoPkCJTv4C8tgETIPJkpWLD0qcxTbpNO/fazchxwO7BiOU96uiO/Z3uZ89Ns0a59bGJcSf86tOdQxoToDrCWNRIIDtAQh/7kTQbhMd+pAoZjxXnAY+VEIlUK7YcqhW1ilQbPP2NAdL967ln7Rp/efWVRk6qT0iZcezJAekgk086cO3GevvuqulL4n3hNQsKD40mUCy7VyElXQMqVnE7zAzZdv4c4bUtF5l0YcrLj8tJtWqxGl+1rl210rD0s8VuS0Pk+gvMaOIV4lExct3Gevd/E1LuL5+szzjytX/Wrkp37SP/tFGLSvI7lU6UKvvx/U/FnYstB+EeXr7H3fLYP91V197gvn/5Ze6+Jya6nMojZstBHB2norXDPT1pkvvxDy6zz3++e4Krra93J77+Jv6Nj5enzTKbkA7EA/evWwNKNhWQKtV3l/36+pT/cE9IRP3+lvsedM/m7E3bHkgx7pX71ncM2N/d++CQ6+R88mS12DaxSqQ+807oF2xuluvArqPQU/G6kWJ2I20ZSecfxCed7DnlVwFuNakTBYJxICTlVnz5heHTjxdFUwQTUk72G/lURDyiXg3/0yuuMBUSdgzw1RAdoPc0rv6fDnQGjUxt251TF8T7f3HdDe4Hl0eEuvv+h6xCZPHaLfH3/3P1lSbFfnX1lfG+55971h2qrx9yDjB3yQqTdHTgM4FX/ZMnXrLfQCIRSSo2/Ay47/D44PLLL7N2CNsjPIYvPUOoTanWISYKcKqw61SVjdRDaylm5xcByJmQQ3FOSeer1Vi1JjxWlS3hVpNfJUQCCvbvsXgcjsMXn39qWL9nf3wjcs0pLFSgEtJJMj3y+gz7zKjnM2RSR4Qq6r9vvj3+3icd75FuOibSkGDwPWuTnfTYjIV2LZM/Whbvw2N9Z/7H8eeJz0wy56HpaGe87957JrhTX3/jdu7cGe/7cuVqS4Wplo5wSUg6STiuzb9WvgvvNSRTeO8QONzHPbKffdy7HIZf3vOAm1fcmkJCaY90pPPrFovrGoY4E3IoxjzpthxqS1GtisthU4ArE6OaUTyjoCWlk9TAIbGu/8OdKUa1fu+rF1+V8fyGax7+R/TfPz9oNuGc3ZXu3ici+/HKK680j/XZV16zz//1/ctc7eEOi8lhy+k4b015w0j3+WefxvtKaurNpsN7feyFf7uf33y7+9Hvb7fzi0j6LZ0fOg7+e36LZNY+STX/GAy2sD18M8Tf//iGg9bmv3nhnXiffsfg1gJBePPYuP60xjFBOsXn/GAwpUusCccSXYAqEmJyq5Z95T775CPDusbk6MFwf6kUm6fTsgLADyWEoOPUSFJR4LkPl6WQTiObDtM+SZCf/OZ6s1t++LMrhhxfmPLBR+Z93n7XXfb5H09PsjAJDkReYVH8u/fmznGnv3Fu6pQ34n3E75B0kPaKK5OqGEAA1L8+yzGKr827J9meag/fxuM7/e7qh/6R0h6hLahj86p4Jv8Jf8uURmkbebA+6YoORYF+BAsCRuvNDJedGGkbkXS+LafkfhSba4/TJLLnVAmMPcfUweVfLHEff7jA4K8wRE6SUcWNctNXZ7BdBL+RfMmFyhDp/A5Jp6KuevJlq22LP197g0nKP/zlIff0mzPdqsJqi80RJvnR9yMbb9qs2UYmpNycOXPi/6JWv/7Gufv+NME+//meCaaCpV6x6aha8UmQzjsNbVAGjb7TPn/A+TbebVMXpLSHrw3C/6vG7vLEgPPtxnSk81dCKKiOHEQ8WGUm5MWeM9L5YjId6RQqCTMQFGcq5cVyXahWPNaF8993S75YGt/Ex7X9RjifdJd7o5LfKCQQ2j1A0uyHP7/Cfqv9oefKPhnWeMR3rCmxc/7o51HD3/bYRLewpNXSXpBkQc4W81rzG4/Fx1m9aZuRCdI992wUGgEQDvx3wqO95aYbjZyEVjgGeVvO5ZNA9+KTyB8U4XeSVNwvA8q3T/G2n9rTnNIeYUBZ+/nP3dsbzU7WeXwbOR3plIIEB6ojLUZ0QmGT80q60JZTfE72nHJz2HMKkwBKl0h3fb74Yzfv/TluU2FZfBOESbQGHA/s+NX8JFmunzJ/WNL5nXTlLXfYbyXpQqnh41dvzLMaMgzlO15JzXYIP/z+ZeZEfJ67Nd5XUFVnAWGCwRCLfb/+xVWOZgUinYCk4xiETDiXTwJJJF/1++QCPhkyeZ6Q6a3cPGuj0C70j+vbhACi6r0GpUjn23Thei+FldFyuulI5+dhxxzpNhRVxDfBRGkFI3EgfONfaiAd6WhUX5rd+vL0FNJJqtEpvj3065lLzTPjfFpP5K//nuF+ckXStvvNDTe4f778mlWUvDb93Xi/shCH25Nq+b57Jhjh2NatyXG3Jsh4z90TjHQcg6UmwophXZNPrPAeQ2kFOXyJB5EgmtrIbw//fwDJqDZBrUJU/dYnqO+9Pl/aHVdsA5YeYz7yxSfdQL+dFP2uGeLofMqXbH3fvTtjJ4LY3Ptz33Xbyg/FN0Kk3icdsTPN6gpJNxyU3hHp1Km+vWLHTMzwQrKSZ4X0pM6IExI3VEWJqoPJQlDG5Ke+kHRkIPBYUat+s/KezAS/g3RK+FMYGl7zuUK2bSTwW7+tfPikU3ZIIa31LReZdDqB77lq0g0XxcWpooSgMEWanyxa6ObOmel21R2xmyBGx4x0LRQdkk4pm2waVATlNZ0TIRBxhwDYK2QJsFm0JolWziRXigMAYVQ7N1rSqZAT9YpNx/2dzYSc4ZBtGwkiXTi5x89IMCHJJxzYdnjAohGZSHfebbqzId2y3QdSSAcJQEi60TSoSEcSPF2cC0Bi7EbOhb0C6Ujwi3TkW5Xkx3OFdFQIQzqkFuVKIekIlcimA5DQJx3HYGEdPOUwOHyukG0bCZmqU8i9Ur/IaqRMEUC1+rnXvNbusUs6KoSZ/6DlWCnUVLhkzuwZ7qtd+VlJOjVoNjVjKuEervFfSqTYUOWEMDTTizq9UNL5k29CSUfdHFUlJxOkk7QT6SCk2X4Dp606haIBJGqYez0XOJOkP/V0YU0doA1ZwBvCAU2K0kSd0ppaM5v8kEkcp7sopGtrTZKusizOt4KN63JsptdHH85PIR0YiXRaoShsoHTgeMP9dnpln3llesYq59b0QpEOmw4bDNKpaJOZ+6MhnWw6SEd1CqSjAx8ZxUSabOFL+PC7dNDgTFdd/UhhtFgPhKNkXzlXkNsyGK+CiqN4XoPD54N0nyxNxumYCJLJkQCa8RU2UDqMVE+HvaIyJkhHoSjqFUlHLEqOBKRjBhcxNoLDlKdTKVx9uMMt/Hixa23vMtJRWSK7TsTz1SvqGNIxg4wOTFdPh/2Jl6rMA8BDDW3RTPBt2fC7dEhHUtqbZW/ZD+H0WAM+aw27PYf7Lm3SAVWXhHE6fwEcIKM3m9ldqhwODWSAlIHUIh2rqSPpUHsQghFO9bJPOiSdSEfp+WfLV5mdqCphkU7SDvBekg7S8X+kJnYjKw+E16X4m79PSfrwt+kwmvYBYXU1baWV3YnJEU8koqCJOZ/XRROl8iuigD8g96o1Ts5L7jVr0o3CpjMVm5huiFpD6gBlJIAaSXnCbOZ43vVRrvuf626wTlSSnziWYn+X/ewKd9O7S43gnO8Xt97h/vjMK+6a2+6w73/7xzvNmSCu9sLbsyz9BZbmbnVzP/wkdk7AitU59krelaDw2jU57oXnnnV/f+xRIx1FAZNfe9399re/NacESXrLh7lxnI3rC0uVIKCcIEk+fqPwD/eh/QoE/2naAiv94n0Y10sHNIG0AVJPKyKw2ucjBVFlidSqims3tgxaOlOrMvilTZqicE5Lm86EdCN5r2BNbbvdEGDJKmry/YS/Gmk4G8QHHUZ666lZH7onNx60zqNjVN7zu9Ul7pfPR4HXB3JLzXulDP6yy7/nnpz/lXv+i4323csfLXOzVmy29wvXbHErdhW4/Q3HXElzu7trwgT38COPuLLaeldRG4VlyEh89uli19HVbYFhKk7kSNw9YYL7+8RnTGJSjPC9RHEp16VyI4hELFGVI6hVDRjec/2qQoGwSo1JQv7qtjvcK2v3WaDYz9Wmg5wOFhWSBwvp8FYZ8CxJi+RXv2jpsH2HWqw/tQY0fTxcEafU6jkn3dkEh8GK3QXxzQEWZk5HOoCtNtIyCjQ4ncQolmdGZ9JJqBJUK1Ps6Kg75yx1T+5utPcTJk+3iTiMbj6/tGiZm7FiU0S6nC3xeiXMjaCA851Zs81eW7Zytf1m2/YdsYrlc05OTqxe/+sHl7mZCz62sAlpp7snTx9y3RDMt98gjyRaKL0kGXmvzAVFDhCI70YinVSrCmZpV0wa5VpZOkwZCIVKCAiTVTJbLrHoUTgNUYHhMU+6d6a9OeTRRJYLzYse8ubbdZqAkmlqoa+S/EnIIqLsuT9ubbDf3T5nqbv3o9yIZHnNVrrz4pp99nlqbp5Nrr7/yaft81vzovKmwqZ2+0zSn2T+zNlzrGRdtl1RcbF9zyuSrjwhCb9Yv80tXhflb6ceaE6ZbC1i+fYb0kw2ne5J30ny8Z4B9fO7H7B7pX34T1jO5AN7UoFeBiZt6a9lwiMPZMctq4+essgC4rsr68Yg6bLMva5Zudxyr/M/mGuYMX2qy6lLLumlBoF4lJCTjlGDZVoSQfAlgD+hWJKCNdlo3GveiH738M5Gd/NL71iFCbE6pjw+Mf8r+44Rjl1Hte9zb820xD/xurV7Cuz7ysMdVlP36COPuMcefSQmHRKO7wmjQLpZs6PSp6LmdjctUXlMZ/sBYtXU+cTiM6oznYMBqZTW4/2NE1+xe0VtIh3D4gGALeyvNqo2VPYhqhDuitdssfX3Esu0bT88YBPiWTtQthzwnYjzMgXR/zM429KmD+d/YJg1c5r7dO2GFNKphIa10niMpS/t0i2JIMioRhLw/pmFy9zUAy3WEXTOtZ/vctfNXGo23/VTogqTX9z9gLvqljts2qEtHTtpsrv6uhtMjb+8aJlbvK/KpN1VV15pjsD0BRFx9pYfMq/097+70YhFzA6SMfWQ77ft2GHvkYLMpUAtbymtte8oJ3p1R4URSqES9sueEwl51T0hwXgvm02/5TsGiswOvpMqxg7GqxXZ+I3A4t8QjkEtO26B97CXdYnnibEo4v6iQivAVb5VNrtvz8m2N8KlmWydzTaEdNoykY4TqohTDx9JV8RJ2MQv4pRDkdOYVK+ET1SPT4iBh3KIWCMl/2XTGPl+c73ZOrdsaUh6rj+9wiQdUhTS/fia693vJr4SP0nwhj8/6P74+EQ3u7DF/TLhAV9z/Q1uVUG1hTw2ltS6q6+KKoBrDkedvmHrdpv3SswO4jFXgv0UcU6aNMndffcEW88Em3Dy3EVxOZENhI31RiB5pnyGjL5dxmffcw3Jyew3zAmp6RsXrovNC2CStaTH/bMkuaad4qCQjvDRBwli0vZMGYidh/q2WGggQBSbU3xupCT/OSWdDixRGnqwmn7ol6tj17HC5urlyXJ1SpzA0s077Cb1oFyCxay66Ru7qEYaO9tVKEVQze38pH7AVAnHISPBIjlkQAiboM6V+IfwkF0qVikxMgoEijXDn5gd2QYcCkrXUbHKx+JEQEL28z2rAZBKI5+LrRiWOJ0pZOf+rajb3vsqlDZTiIm2os34nvfCw4l0F7/nMaTcu6q5UauScOa1JqYdqjJcs8BSwiSXEumw7dYm1jIR3qzodROLKTtKuu+o14mJEZvN2nN4sD5BPzjEyp2Rk8IIh3iK1yHtIB6lPARIUTOsvQtJqCKGeMpQsL6w1qVjwrWWlVBqDEBA9uHBkskgjcb8WYo5qeE725WbMDGQSn4FCPdKu4Tmh78qO22Bt0o7inCQkVn8WtYDb3Xb9m1jm3TyYIebDebbdV9+/plh0YJ5BgLFHy1fFT/fXgvokIZBKrAUK0vRq3ElAXlkZdgZPtItk0rCH2mHiiU8Q2YCm4bFp7HtyMMSPuEcLBFGWoxnteppOJQ7kcDXqk3kYnEqNDtMy0vwKklHzhaS8l+CzkT7R/MMCQHpDYH8tfkYHKjTTF69JD6Sz2Z55XfaPeq/DDLafF3CccCO25pXYM9ek1r1VaueK+GrVvHgTGw5bSOSTvBtu2wmW/OYJX8NE8InIJZ2VYftxgmjyKn4R3Ei1EEYZT+VrEm1C5B+w62Snk4di3jE7KgbI+dLSgziIe30xEBULMRjVXSIpzVNkHYqAqDcSevTQTwtpANEOuZJYNcRIKbECS9x49ETQ641BB4papN7VNZAkkkZg1Cq+eCedf/cLytGaWFrVCn1chBQYSsGPeERIg1oJjSUgsGScupfea1n47H6W0bSsaUjXahi42UlEmvSAcInBXm7U1ZriiXewkjaTZs6xa1OOBUiHu9ZiBmpRMPJmyVlo04QkABINUa3SJZO2gG8NjqMcIEKOpkMjbRDEknakexm2VcWt9aK6niyJPGx07TWMN4ssbtwjTrNCIN0hF20OCLX5F8P14K04jr9JW0F9kFAiDhS+EiQt48ToRVMUakQjewPr5/VRYTjPrdVN5tgAEp5kWPV6urhzK/hPNZLinRzF30Ue0+f1g3E0XFI8FBBkniQSmqGJ/6hYnxDWiRkv0Z3mBCnipcOhIAQT49hwubCm5WUwLbTesMQTwsjQjzI5K85rOVfIRz2nGaEoYr9tYexJ2fXRCVbvhQDfIYwGkCZyJTuO4FHVakNpBmQ3q+WRQsEAV/Cba5osAD+mCedb9spSKyKA2J2iGMFE1NV7DoDGQqggDFxu6lvvuaWbN4ZL3Y9oyL5vCtese8k7fTEP199SiVBNt/28UFHq1NfKOu1J1TrYXOoWYiHmqX+jXOiZjGyWcEJp8L3ZLHtIJ6vZqVqIZ9Ip6X9sevwijkX6/hyfK6Ha0HSDacugWy04aScpLsGLKSbVNJt56RGLlpHOWob2nlXdZMVZBAEVogEIUFWKTUu5z35+kI+vORCkA6syiuJHQvzKD0CvXKwx926L6pEUQNDsEx2HR1FsJnfEYtKR0bOgVeL44Kqxd5hwg4qCEmpWjsknj1EuC3pVBBCgVSoWi3p76+yDhmRhkhG7DrCMDhJnC+81pGga89ETp78qHuCbJRukU/FWeKc2HJfJDSJOQ0lVdHyu5cK6QQ5E4hbVRzEKlbPb5WK3b8nfjI1i1tHq6ovcYs/+tB98N5scyjAm1P+7ZYXVFnjIPHIAUIAST0aFLVKgJMUl4gXdoLgG9W+moWQACmDk6LAMfYdHaYHFWP8oxapLEbNIu1QsyTyVQygh5dopXUIx6uW9od02HU4JZAcFTua0Inq5kL7lEAvsboFNd4gquqzXCqSGxsVEASOn+3aOujW79xrqy4QVQCkK7UIOc6DHliiha1Vkh6q1pAP55x0bOEJUqSd91gmSTt5ssR6iPmoCIAn5IC1q1bYgjoUeL43d5Zh+jtvuTffeNUt31sc13Rh4xHApRpFMSbIgIcLQfiMWh1O4omcmX6D+uZBbRACNatsBSpJyXBULcTTjDFNU/QlnsgHUL3s4zeoWLxgVLY9GDnLZ4SpJMkfWEg7bDffJkSlvlzaY3Yp0NrJtJ2C75ua+y1Nx4DHxlZ/0DeKNqCdWCBHIRKlvC7aozdD0gFf2kni+cFixe2I+fipsWjNunU2EZu8rGJ3pMdEvNX7S2PisSgfTgXl1HSATz7NRGdtX9SvX/IuSFoMZxPRmV82DVgAWQ8x8W08vGp/fqwknlStpB7xOQjHK5IOb5dqFVQz/4csSKfw/CEkpbluJDFSzfdw5SjQFqhQJo/TFkDrJvM973fWHbW6Rp9weohM6DjQb2PuIcOZpJ1v3ymuowfRaVVO4C/tT/wO+27J4k8MIt6Md94yfLx8ZZyiQc0RMqGBqY4gzKEKCYE4llJnIZSbHKkolJlbxAax8ZB4SA2Ih8TzVS3Ek2Oh0nY9CREJByAhhBTpiP1hJ0LskebC6pmsDCb/HgmYa+V57pdCTHvocoJ0HyecMb5fixO0v8jUKRDhsLNVDYxQkDk0Zh+nfiFJ99aU19y06dPcppaoEWnMJfWRusUjw1CGfP6SVgCJ8GBBl1VWqBP9cMtIxIMQOBXE83jFNtKj1P3ZY6hayISqVQyP4LEexQkgIyk0wiaQlVAMUpSsSHheeeHhYGKwYcviiUr6QThUteKLKdKtvt/taGh3Xy1bZgH5bxXpgGJ2QHE7xXVU9mS2XSLKLaOV+B2OBR6UPNqlny62+J1svJkz3nZT33rdvf7vl93KotpY3SJx8C4Z3YCRTs6W+jg/LwmQGNhA9yWCx9kSD+BcaDKPCgOQeOpgnAN/riwSD8kG8VC3zJvlM/uxA0mrkdeFLPdTfJBI2ofZB4AKxm5VvhhVL7OC64BoSh3q+bhgQ3O/W7t9l9nL5Lyp8pHTILUqsolwqhJK5zjIjgttuXOxZU06baG0k8QLnyuBQYqt4IdR7MF0RfnmOYl4gEbCxlMZFKkyQirvvD3F7LwPPlns1ntFAnhlGMp0ggiIQS1JocnDfmfy2wWJfUiQ27zHeKYDUo+FG7XquJwL1CTOBSqT4DGeLVkLPQIAsgEcCSQd36GSkXYQDCdo99ET8XUxN3e2V24E2amIeaEk9fmsknSrGqLCBP1/TfOA21JaY7PvcNIAmoT2VVEtbR5KN5HNJ5xs9LNN6I+0nTHpYmmXkHhSs1K1euararJ88vnEAzQSlcZfLfncQI52wbz3IpWbCKu8PfUNt2xPkVvVlEzlIHnInUI6cqmoXf+RkthlhEbwgP2JxD6QgKhlJCCOB0AK4f0ikcjZys7DdoLYEB51qeIAiIdzgQ0H2QRIpxwsgWbFIZHY5EZ5ngWk07WSG4Z0epq3iKinMy7zyIbdtr32iA1WVGluzqo4QoDDhimjqh/aHIchlG7STPJUz5fjEG6XFOnAlNdfdesrm1OeuMN74lKEOyAH3q4kA1KCADNZCAjE/AkFjwk5IGVCFRcClUpsD1JzfAislBlSh+wFNh7qVk4GBET6oX4hJVIRdcj/UN++QwTJCOpiEqiaGqnM93jw/twSSpFyS2rdkqVLbLbdd4J0bLqIOEvh5WRl38mxwEgFmsQj4tEYBI8BjUT9nfK0uPk4GMTyVIen+bM4Gth7M2bNdLmVLS4nUaYj8jFZWA8rpjP9EANS5qkinkEWxeX03cyqqGo5mrTSbXgwgQc8fFg3YAa8VoBSjRv1abLzqEwhrIJaBRCRfXxHdgKiMjg4PwRD0up5GgJxNv9xSTgIm1v63eaSasvoAILsQOoU242aOMAcB5w32dO0uYVF2lpTVKqC+yKc7zicL8KxnRXpfPJxsX5Ju088n3ySegSP5dkW5e+1+bJ6jhgeF3aepB5QTA8Czn53eor0W3Wg3OV65EP1IlXoYHvqtT2QI9mp2Eqos5cSzwXTfkjKLCokUfT4zwhavw3gTerpgVoXheAvJMFuQ5Ui2fBaARIQQDokItfFOSHd+tbjHtGiuKTCHiCnacBtrGt3X65Za0SjPYhxAnmmkmw4aCrCJD5K5ABHDigORz/4C+Ao+OtLt3Ptqabbzoh0bJmIJ/KJeLrJmHwJlQvxqDYGFH4SQFa0HJVLFQRST/V4ejSACOhLP3M6pr3pPlm+ym06dDRF+gHyj3QqKjeUKjzLArUmdQwgE6o0HemEWTV9FurA6Jf3zDkIqUAunAcICCCcSIcDgoRU9YcyBwI50i2N3W59fmks1SAbg9Cek7sx1yDThPai7Ri8ctZwGAhZKUMUZRkSQV/PQw3VaTrHYUyRji28ON/G84knqefbeoRU9GhHcrV4V7JBsEeQfDyLQs8Wk+qFgJRIUQKP+gXYf8yt9Un4SU6uW1dz1K1OOB6+REFdqbbMR+j1on6RSq+X95hUxFkBxPDAa4lVPbHzUN3Ya6h47Dxq8igWgHw4G7wX6eR5Q2jmm6J2N9R1uDW78iwvTQgJb1RSDbIxCCGZVKjinrQXbYdkk93MoPa9U6IJfvwtDImkk27ng2zavrWkI61GzR5VLPMWLXIr8g+6tXVdRghfhQns8xcEHA6Kkyk2SPbkH4lJP0g9iIiHCgEhFAQUqFzB64bQ2IUP7221qhukN4QbJ12WW3ixIfFC8tEIzK2Q+MerMjsvYfiibglmYqeo0FD2nghIUJmOAXSSqd2F8wyQEPWL94v9ByCiPOE57891X2za7jZWtbgNDV02UWh102AchD5TQNxXyrotxKFKZGw4iA7ZUL28h5D8HoJS4bJvz24bSHqOGp489pqvSkU0324DchRQp5qHHNpvOAtEFUS2mHAZCjLPJ+HYvpOkw/5DCsoRQRqSeiMQvTRnnft8/Rb31e4Ct6myyZBb1epyqtuGYH1Vq9tc1WzIKagwIn+5boNbvWWHeya/zSQZalQxRbxcnBveI1WRiGQ87s87ahJ8nHSj2MILDomXQr7BActaKF0G5NXG6ra20gxijGPyhQACioSEB1A38uAIG9BpivMRu0L9EscSEXmIipa4oJaPdJvUsUjpg1ScSCqwL/wd4P8cR2k8jr/owwXu3c37LcSiuB62HJAaJw5HaAenpb7uUGxKMFmGHLUcK5FNJANKZ0G2MBziq1N5qSkhkTRlSheKcGznhHRs4YWD0KMV+WgERp9GInYeHlYs+RLxPGw9eWQKr0BAOoGRT8eASAKu80i40rw94n0+EeUNIhWxnZR2M2IumBcvgYGkHAn6rYVyFs6z48gm4/ich3PmrFrhXtlWFj/QmOqRqMwpWjcOSYhEJAxzoLDQBhWBc2JtsnFFNkimgamgO7YbWoM2TCfZUuy3C+ihDredM9KxhTci4sUBZC97EarcFMl39HAK+URAkdDUb1G+dQxAAkLCPTu2GnBAUEtIDRERlYzaAhASyQgpASoaYiosA1kMnwbQ/s8Wx7/lf/yf4yi8w/E5j5wfzp+3Z6ebXdhkgWUISIAYzxivV89K+1v+UVdeUmCDC+dAISWyCSKaHwYBqFHaDu0xnGTL5CxcaMKxnVPS+Vt4Y2H2IlS5jM6kh9uRQj4REBDsZMTTGSrToZOMhImCUSQhagkPWETELpJdGBGSuRuROhMxSSUBkUVP5Ra0H+i3+m90rGg+CMfnPKry4PxIMIuplZW6KYUtFmahRhDCQUBCMMxQq2pps8ElOw1Q1YtEE8lENCA1CtHSSbaxRDZt46S7wKRT6q+2qtzNKztsJUwsdUGdIFkKpkjuqIok/DjpzmALb9InoC/6Y3WbKBgQAUU+EVAkRM3QGbHqTZBQ9h82UEhEUm1yRrCZUMdarpY0kogpiDAh/N8A/sf/OY5iaEauvN1xLI3zcy3UE2rpDQ2Y6ro692JRm6ldyEeG49790ULigmw2kcx3EmS7hepUgzwk3FjYzivp2ELCpRDPs/NEPp+AofQDjHI6gc6QFBQJlWvEBkJF+USkg9XhEBIDXeEHnBMjZ8JGhKAiTAi+A/ot/+P/HEeGP8dPIVZFqTkCBHDldWrAcN1I8OYjbW5RdZRio3jz/aru+J5xDmKbLTEwJdXCRP1YlGzhdt5JF25hQ6QQ0PN0Q+nnOx2RxxsRMCahp4pRRyKivD06WBNR6HQIIEOd4gORUwQdCf7v+T/H4ZgiFucRsRgIIhfXBnStDB7UZhTqaHflbR3uxdJotanlDb2RJ+qpz5R8aRZOwlgim7Zx0o0x0kmNtvdQpdzjWnoGx0l3LrawUXzyhc6Gr3IBjU8n+KpXJFSn0YF0JERU0aLIKEKaSksY6iKn1LPIMhz0W/6nY8jZ4fg+sTg/1yJyAQ0Yrlu2msr9fVut/3hEtNg5yFKVjkWyabsopNMWNlJIQF/6pZOCqgeTFFSnpRIxaQuqw5GMImWMttYUgo4E/daM/cQxFDvj+KnEYjAkyeUTTOrTt9OG2GqeNEvnHIQY69tFJZ2/hQ3nky/F6QjUsE9CwVfHqo4VGX3pqLBDkpyRpAQiTAj/NyKTCCVwbP9cMbE8R0ADJiPJAml2qRPN38YM6fwtbNAQI5EwHRHVySYZPVKG5BRBR4L/+/BYwxHLv8bhVOZIJBMuxW2cdOOku+DbmCSdtrCBM2E4FezDJ2RIynMBHTckVzpihQTLhmTflm2cdOcQ46TLbhvTpEu3hR2RCX5nZkPIc44zJJaPb+t2yZHO38JOGg1CUoYIJVI6AmVCeK5s8V3ZLmnSjW+X5jZOuvHtgm/jpBvfLvg2Trrx7YJv/x/OmCxk8YqA0wAAAABJRU5ErkJggg==";
+
+function newStructure(name){
+  return {
+    id: 's'+Date.now()+Math.floor(Math.random()*1000),
+    name: name || 'Structure sans nom',
+    axeA: '101', axeB: '103',
+    jaune: 2.0, rouge: 3.0, trendEps: 0.15,
+    etalonLocked: false,
+    viewRoundId: null, // null = toujours la dernière ronde (automatique) ; sinon, retour en arrière sur une ronde précise
+    points: ["101","111","102","112","103","113"],
+    refPoints: ["REF1","REF2","REF3"],
+    rounds: [],
+    pointMapping: {},
+    pairs: [] // paires bas/haut pour le calcul du pendage (angle zénithal)
+  };
+}
+
+/* ---------------- READ-ONLY EXPORT SUPPORT ----------------
+   These two placeholders are replaced (as plain string search/replace)
+   at export time by exportConsultationVersion(), which lives only in the
+   full desktop copy of this file. In the file you are looking at right now,
+   they remain untouched, so the app behaves as the normal, fully editable
+   desktop version. */
+const __EXPORTED_STATE_RAW__ = "{\"config\":{\"client\":\"HUDL\",\"projet\":\"AN-26-008- PONT 20621 RIVIÈRE CHASSÉ\",\"resp\":\"Arpent-Nord Construction\",\"sys\":\"SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28\",\"fc\":1,\"decimals\":3},\"instruments\":[{\"id\":\"i2\",\"fab\":\"Leica\",\"mod\":\"TS1203\",\"ser\":\"—\",\"cal\":\"—\"},{\"id\":\"i1783357921713\",\"fab\":\"Leica\",\"mod\":\"MS60 1\\\" R2000\",\"ser\":\"885396\",\"cal\":\"885396-251229-1059/29. Décembre 2025\"}],\"structures\":[{\"id\":\"s1783350091097882\",\"name\":\"MUR DE REMBLAIS EXISTANT\",\"axeA\":\"101\",\"axeB\":\"102\",\"jaune\":2,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"101\",\"102\",\"103\",\"111\",\"112\",\"113\"],\"refPoints\":[\"53\"],\"rounds\":[{\"id\":\"r1783362493363\",\"date\":\"2026-06-13\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.157,\"z\":163.967},\"102\":{\"n\":5146856.875,\"e\":264465.988,\"z\":163.975},\"103\":{\"n\":5146848.277,\"e\":264462.262,\"z\":163.775},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.976},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.015},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783367540498\",\"date\":\"2026-06-20\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368120659\",\"date\":\"2026-06-25\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.32,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.186,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783362193699\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"Levé étalon de référence\",\"isReference\":true,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368395307\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783369145955\",\"date\":\"2026-07-01\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.277,\"e\":264462.26,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783369267499\",\"date\":\"2026-07-04\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.012},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[]}],\"pointMapping\":{},\"etalonLocked\":true,\"viewRoundId\":null,\"pairs\":[{\"id\":\"pr178344615167329\",\"bas\":\"101\",\"haut\":\"111\"},{\"id\":\"pr1783446158121250\",\"bas\":\"102\",\"haut\":\"112\"},{\"id\":\"pr1783446164273167\",\"bas\":\"103\",\"haut\":\"113\"}]},{\"id\":\"s1783350102160448\",\"name\":\"MUR BERLINOIS\",\"axeA\":\"MON1\",\"axeB\":\"MON1\",\"jaune\":2,\"rouge\":3,\"trendEps\":0.15,\"points\":[\"MON1\",\"MON11\",\"MON2\",\"MON12\",\"MON3\",\"MON13\"],\"refPoints\":[\"REF1\",\"REF2\",\"REF3\"],\"rounds\":[],\"pointMapping\":{}}],\"activeStructureId\":\"s1783350091097882\"}";
+const __EXPORT_TIMESTAMP__ = "7 juillet 2026 à 14 h 52";
+let VIEW_ONLY = ("true" === "true");
+let __EXPORTED_STATE__ = null;
+if(__EXPORTED_STATE_RAW__ !== "__STATE_JSON_PLACEHOLDER__"){
+  try{ __EXPORTED_STATE__ = JSON.parse(__EXPORTED_STATE_RAW__); }catch(e){ __EXPORTED_STATE__ = null; }
+}
+
+let state = __EXPORTED_STATE__ || {
+  config: { client:'HUDL', projet:'AN-26-008', resp:'Arpent-Nord Construction', sys:'SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28', fc:1, decimals:3 },
+  instruments: [
+    {id:"i1", fab:"Leica", mod:"MS60", ser:"—", cal:"Étalon 27 juin 2026"},
+    {id:"i2", fab:"Leica", mod:"TS1203", ser:"—", cal:"—"}
+  ],
+  structures: [ newStructure('MTQ — A0055 / MON70') ],
+  activeStructureId: null
+};
+if(!state.activeStructureId && state.structures && state.structures.length){
+  state.activeStructureId = state.structures[0].id;
+}
+
+function cur(){ return state.structures.find(s=>s.id===state.activeStructureId) || state.structures[0]; }
+function fmtCoord(v){ const d = (state.config.decimals===undefined||state.config.decimals===null) ? 3 : state.config.decimals; return Number(v).toFixed(d); }
+function currentRoundIndex(sortedRounds){
+  // If the user picked a specific past round to view/report (back-tracking), honor it —
+  // otherwise fall back to the latest actual monitoring round, never the étalon itself.
+  const s = cur();
+  if(s.viewRoundId){
+    const idx = sortedRounds.findIndex(r=>r.id===s.viewRoundId);
+    if(idx>=0 && !sortedRounds[idx].isReference) return idx;
+  }
+  for(let i=sortedRounds.length-1;i>=0;i--){
+    if(!sortedRounds[i].isReference) return i;
+  }
+  return sortedRounds.length-1; // only the étalon round exists — nothing to compare yet
+}
+function setViewRound(val){
+  const s = cur();
+  s.viewRoundId = val || null;
+  markDirty();
+  renderResults();
+  syncRoundSelectors();
+}
+function syncRoundSelectors(){
+  const s = cur();
+  const nonRef = s.rounds.filter(r=>!r.isReference).sort((a,b)=>a.date.localeCompare(b.date));
+  const optsHtml = '<option value="">Dernière ronde (automatique)</option>' +
+    nonRef.map(r=>`<option value="${r.id}">${r.date}${r.operateur? ' — '+r.operateur:''}</option>`).join('');
+  ['viewRoundSelectResultats','viewRoundSelectExport'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = optsHtml;
+    sel.value = s.viewRoundId || '';
+  });
+}
+function previousNonRefIndex(sortedRounds, idx){
+  // "ronde précédente" for trend purposes must also skip the étalon — comparing a round
+  // to the étalon (EC=0 by definition) is meaningless as a "previous round" reference,
+  // and can otherwise be picked accidentally when the étalon shares a date with another round.
+  for(let i=idx-1;i>=0;i--){
+    if(!sortedRounds[i].isReference) return i;
+  }
+  return -1;
+}
+
+let pendingParse = null; // holds parsed-but-not-committed round data
+let dirty = false;
+function markDirty(){ if(VIEW_ONLY) return; dirty = true; autosave(); }
+
+/* ---------------- VIEW-ONLY (GitHub consultation) MODE ---------------- */
+function applyViewOnlyMode(){
+  if(!VIEW_ONLY) return;
+  // Hide every tab that allows editing/importing data — only viewing tabs remain.
+  ['config','import','etalon'].forEach(tab=>{
+    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if(btn) btn.style.display = 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  const resultBtn = document.querySelector('.tab-btn[data-tab="resultats"]');
+  if(resultBtn) resultBtn.classList.add('active');
+  const resultPanel = document.getElementById('panel-resultats');
+  if(resultPanel) resultPanel.classList.add('active');
+  // No creating additional structures from a read-only copy.
+  const addBtns = document.querySelectorAll('header.topbar button[onclick="addStructure()"]');
+  addBtns.forEach(b=> b.style.display = 'none');
+  // Banner across the top so nobody mistakes this for the editable desktop version.
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:#FBF0DD;color:#8A5A15;padding:8px 24px;font-size:12.5px;text-align:center;border-bottom:1px solid #E3C98A;';
+  banner.innerHTML = `📄 Version consultation (lecture seule) — générée le ${__EXPORT_TIMESTAMP__}. Aucune modification possible ici.`;
+  document.body.insertBefore(banner, document.body.firstChild);
+}
+
+/* ---------------- TAB NAV ---------------- */
+document.querySelectorAll('.tab-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById('panel-'+b.dataset.tab).classList.add('active');
+    if(b.dataset.tab==='resultats') renderResults();
+    if(b.dataset.tab==='rondes') renderRondes();
+    if(b.dataset.tab==='etalon') renderEtalon();
+    if(b.dataset.tab==='export') syncRoundSelectors();
+    if(b.dataset.tab==='config') renderConfigLists();
+    if(b.dataset.tab==='import'){
+      const opEl = document.getElementById('importOperateur');
+      if(opEl && !opEl.value) opEl.value = state.config.resp || '';
+    }
+  });
+});
+
+/* ---------------- STRUCTURES ---------------- */
+function renderStructureSwitcher(){
+  const sel = document.getElementById('structureSwitcher');
+  sel.innerHTML = state.structures.map(s=>`<option value="${s.id}" ${s.id===state.activeStructureId?'selected':''}>${s.name}</option>`).join('');
+}
+function switchStructure(id){ state.activeStructureId = id; renderAllForActiveTab(); markDirty(); }
+function renderAllForActiveTab(){
+  renderStructureSwitcher();
+  renderConfigLists();
+  renderRondes();
+  renderEtalon();
+  renderResults();
+}
+function addStructure(){
+  const nameEl = document.getElementById('newStructureName');
+  const name = (nameEl && nameEl.value.trim()) || prompt('Nom de la nouvelle structure :','');
+  if(!name) return;
+  const s = newStructure(name);
+  state.structures.push(s);
+  state.activeStructureId = s.id;
+  if(nameEl) nameEl.value='';
+  renderAllForActiveTab();
+  markDirty();
+}
+function renameStructure(i, val){ state.structures[i].name = val; renderStructureSwitcher(); markDirty(); }
+function removeStructure(i){
+  if(state.structures.length<=1){ alert('Il doit rester au moins une structure.'); return; }
+  if(!confirm(`Supprimer la structure « ${state.structures[i].name} » et toutes ses rondes ?`)) return;
+  const wasActive = state.structures[i].id===state.activeStructureId;
+  state.structures.splice(i,1);
+  if(wasActive) state.activeStructureId = state.structures[0].id;
+  renderAllForActiveTab();
+  markDirty();
+}
+function renderStructuresList(){
+  const box = document.getElementById('structuresList');
+  box.innerHTML = state.structures.map((s,i)=>`
+    <div class="list-item">
+      <input type="text" value="${s.name.replace(/"/g,'&quot;')}" onchange="renameStructure(${i}, this.value)" style="flex:1;margin-right:8px;">
+      <span class="small" style="margin-right:8px;">${s.id===state.activeStructureId?'<span class=\"badge ok\">ACTIVE</span>':''}</span>
+      <button class="btn secondary" style="padding:4px 10px;font-size:11.5px;margin-right:6px;" onclick="switchStructure('${s.id}'); renderConfigLists();">Activer</button>
+      <button class="icon-x" onclick="removeStructure(${i})">✕</button>
+    </div>`).join('');
+}
+
+/* ---------------- CONFIG ---------------- */
+function readConfig(){
+  state.config.client = document.getElementById('cfgClient').value;
+  state.config.projet = document.getElementById('cfgProjet').value;
+  state.config.resp = document.getElementById('cfgResp').value;
+  state.config.sys = document.getElementById('cfgSys').value;
+  state.config.fc = parseFloat(document.getElementById('cfgFC').value)||1;
+  state.config.decimals = Math.max(0, Math.min(6, parseInt(document.getElementById('cfgDecimals').value)));
+  if(isNaN(state.config.decimals)) state.config.decimals = 3;
+  const s = cur();
+  s.jaune = parseFloat(document.getElementById('cfgJaune').value)||2;
+  s.rouge = parseFloat(document.getElementById('cfgRouge').value)||3;
+  s.trendEps = parseFloat(document.getElementById('cfgTrendEps').value)||0.15;
+  s.axeA = document.getElementById('cfgAxeA').value;
+  s.axeB = document.getElementById('cfgAxeB').value;
+  updateHeader();
+  markDirty();
+}
+['cfgClient','cfgProjet','cfgResp','cfgSys','cfgFC','cfgDecimals','cfgJaune','cfgRouge','cfgTrendEps','cfgAxeA','cfgAxeB'].forEach(id=>{
+  document.addEventListener('DOMContentLoaded',()=>{
+    const el=document.getElementById(id);
+    el.addEventListener('change', readConfig);
+  });
+});
+
+function updateHeader(){
+  document.getElementById('headerSub').textContent = `Client ${state.config.client||'—'} — Projet ${state.config.projet||'—'}`;
+}
+
+function renderConfigLists(){
+  renderStructureSwitcher();
+  renderStructuresList();
+  const s = cur();
+  document.getElementById('cfgJaune').value = s.jaune;
+  document.getElementById('cfgRouge').value = s.rouge;
+  document.getElementById('cfgTrendEps').value = s.trendEps;
+
+  const pl = document.getElementById('pointsList');
+  pl.innerHTML = s.points.map((p,i)=>`
+    <div class="list-item"><span class="txt"><b>${p}</b></span>
+    <button class="icon-x" onclick="removePoint(${i})">✕</button></div>`).join('') || '<p class="small">Aucun point.</p>';
+  const rpl = document.getElementById('refPointsList');
+  rpl.innerHTML = s.refPoints.map((p,i)=>`
+    <div class="list-item"><span class="txt"><b>${p}</b></span>
+    <button class="icon-x" onclick="removeRefPoint(${i})">✕</button></div>`).join('') || '<p class="small">Aucun point de référence.</p>';
+
+  renderPairsList();
+
+  {
+    const optsHtml = s.points.map(p=>`<option value="${p}">${p}</option>`).join('');
+    const selA = document.getElementById('cfgAxeA');
+    const selB = document.getElementById('cfgAxeB');
+    selA.innerHTML = optsHtml;
+    selB.innerHTML = optsHtml;
+    // Always trust the structure's stored axeA/axeB explicitly — never rely on the browser's
+    // default first-option selection, which silently made both ends of the axis identical before.
+    selA.value = (s.axeA && s.points.includes(s.axeA)) ? s.axeA : (s.points[0] || '');
+    selB.value = (s.axeB && s.points.includes(s.axeB)) ? s.axeB : (s.points[2] || s.points[s.points.length-1] || s.points[0] || '');
+    if(selA.value === selB.value && s.points.length>1){
+      // never allow origin and end to silently coincide
+      selB.value = s.points.find(p=>p!==selA.value) || selB.value;
+    }
+    s.axeA = selA.value; s.axeB = selB.value;
+  }
+
+  const il = document.getElementById('instrList');
+  il.innerHTML = state.instruments.map((ins,i)=>`
+    <div class="list-item"><span class="txt"><b>${ins.fab} ${ins.mod}</b> — série ${ins.ser} — ${ins.cal}</span>
+    <button class="icon-x" onclick="removeInstrument(${i})">✕</button></div>`).join('') || '<p class="small">Aucun instrument.</p>';
+
+  [document.getElementById('importInstrument'), document.getElementById('etalonImportInstrument')].forEach(impSel=>{
+    if(!impSel) return;
+    const curVal = impSel.value;
+    impSel.innerHTML = state.instruments.map(ins=>`<option value="${ins.id}">${ins.fab} ${ins.mod} (série ${ins.ser})</option>`).join('') + `<option value="__new__">+ Nouvel instrument…</option>`;
+    if([...impSel.options].some(o=>o.value===curVal)) impSel.value = curVal;
+  });
+
+  document.getElementById('cfgClient').value = state.config.client;
+  document.getElementById('cfgProjet').value = state.config.projet;
+  document.getElementById('cfgResp').value = state.config.resp;
+  document.getElementById('cfgSys').value = state.config.sys;
+  document.getElementById('cfgFC').value = state.config.fc;
+  document.getElementById('cfgDecimals').value = state.config.decimals===undefined?3:state.config.decimals;
+  updateHeader();
+}
+function addPoint(){
+  const v = document.getElementById('newPointName').value.trim();
+  if(!v) return;
+  const s = cur();
+  if(!s.points.includes(v)) s.points.push(v);
+  document.getElementById('newPointName').value='';
+  renderConfigLists(); markDirty();
+}
+function removePoint(i){ cur().points.splice(i,1); renderConfigLists(); markDirty(); }
+function addRefPoint(){
+  const v = document.getElementById('newRefPointName').value.trim();
+  if(!v) return;
+  const s = cur();
+  if(!s.refPoints.includes(v)) s.refPoints.push(v);
+  document.getElementById('newRefPointName').value='';
+  renderConfigLists(); markDirty();
+}
+function removeRefPoint(i){ cur().refPoints.splice(i,1); renderConfigLists(); markDirty(); }
+
+/* ---------------- PAIRES BAS/HAUT (PENDAGE) ---------------- */
+function renderPairsList(){
+  const s = cur();
+  if(!s.pairs) s.pairs = [];
+  const box = document.getElementById('pairsList');
+  if(box){
+    box.innerHTML = s.pairs.map((p,i)=>`
+      <div class="list-item"><span class="txt"><b>${p.bas}</b> (bas) → <b>${p.haut}</b> (haut)</span>
+      <button class="icon-x" onclick="removePair(${i})">✕</button></div>`).join('') || '<p class="small">Aucune paire configurée.</p>';
+  }
+  const optsHtml = s.points.map(p=>`<option value="${p}">${p}</option>`).join('');
+  const basSel = document.getElementById('newPairBas');
+  const hautSel = document.getElementById('newPairHaut');
+  if(basSel) basSel.innerHTML = optsHtml;
+  if(hautSel) hautSel.innerHTML = optsHtml;
+}
+function addPair(){
+  const s = cur();
+  if(!s.pairs) s.pairs = [];
+  const bas = document.getElementById('newPairBas').value;
+  const haut = document.getElementById('newPairHaut').value;
+  if(!bas || !haut){ alert('Choisissez un point du bas et un point du haut.'); return; }
+  if(bas===haut){ alert('Le point du bas et du haut doivent être différents.'); return; }
+  if(s.pairs.some(p=>p.bas===bas && p.haut===haut)){ alert('Cette paire existe déjà.'); return; }
+  s.pairs.push({id:'pr'+Date.now()+Math.floor(Math.random()*1000), bas, haut});
+  renderPairsList(); markDirty();
+}
+function removePair(i){ cur().pairs.splice(i,1); renderPairsList(); markDirty(); }
+function toDMS(deg){
+  const sign = deg<0 ? '-' : '';
+  const a = Math.abs(deg);
+  const d = Math.floor(a);
+  const mFull = (a-d)*60;
+  const m = Math.floor(mFull);
+  const sec = (mFull-m)*60;
+  return `${sign}${d}°${String(m).padStart(2,'0')}'${sec.toFixed(1)}"`;
+}
+function computePendage(bas, haut){
+  if(!bas || !haut) return null;
+  const dN = haut.n - bas.n;
+  const dE = haut.e - bas.e;
+  const dZ = haut.z - bas.z;
+  const horiz = Math.hypot(dN, dE);
+  const pente = Math.hypot(dN, dE, dZ); // distance en pente (3D) entre les deux points
+  const zenithDeg = Math.atan2(horiz, dZ) * 180 / Math.PI; // 0° = parfaitement à l'aplomb (vertical)
+  let bearingDeg = Math.atan2(dE, dN) * 180 / Math.PI; if(bearingDeg<0) bearingDeg += 360;
+  return {dN, dE, dZ, horiz, pente, zenithDeg, bearingDeg};
+}
+function renderPendageTable(data, curIdx){
+  const s = cur();
+  const box = document.getElementById('pendageTableBox');
+  if(!box) return;
+  if(!s.pairs || s.pairs.length===0){ box.innerHTML=''; return; }
+  const curRound = data.sortedRounds[curIdx];
+  const rows = s.pairs.map(pair=>{
+    const basEt = data.ref.points[pair.bas], hautEt = data.ref.points[pair.haut];
+    const basCur = curRound ? curRound.points[pair.bas] : null;
+    const hautCur = curRound ? curRound.points[pair.haut] : null;
+    const etCalc = computePendage(basEt, hautEt);
+    const curCalc = computePendage(basCur, hautCur);
+    if(!etCalc || !curCalc){
+      return `<tr><td class="left">${pair.bas} / ${pair.haut}</td><td colspan="6" class="small">Données insuffisantes pour cette paire à cette ronde</td></tr>`;
+    }
+    const deltaDeg = curCalc.zenithDeg - etCalc.zenithDeg;
+    const convertedMM = curCalc.pente * Math.tan(deltaDeg*Math.PI/180) * 1000;
+    return `<tr>
+      <td class="left">${pair.bas} (bas) / ${pair.haut} (haut)</td>
+      <td>${curCalc.pente.toFixed(3)} m</td>
+      <td>${toDMS(curCalc.zenithDeg)}</td>
+      <td>${toDMS(etCalc.zenithDeg)}</td>
+      <td>${deltaDeg>=0?'+':''}${toDMS(deltaDeg)}</td>
+      <td>${convertedMM>=0?'+':''}${convertedMM.toFixed(1)} mm</td>
+      <td>${(curCalc.horiz*1000).toFixed(1)} mm</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table class="data">
+    <tr><th class="left">Paire (bas / haut)</th><th>Distance en pente</th><th>Angle zénithal — ronde courante</th><th>Angle zénithal — étalon</th><th>Écart</th><th>Écart converti (à cette distance)</th><th>Déversement horizontal</th></tr>
+    ${rows}
+  </table>`;
+}
+
+function resetDefaultPoints(){
+  if(!confirm("Remplacer la liste actuelle des points de monitoring par les noms par défaut (101, 111, 102, 112, 103, 113) ? Les correspondances déjà mémorisées vers d'anciens noms devront être refaites.")) return;
+  cur().points = ["101","111","102","112","103","113"];
+  renderConfigLists(); markDirty();
+}
+function resetDefaultRefPoints(){
+  if(!confirm("Remplacer la liste actuelle des points de référence par les noms par défaut (REF1, REF2, REF3) ?")) return;
+  cur().refPoints = ["REF1","REF2","REF3"];
+  renderConfigLists(); markDirty();
+}
+function addInstrument(){
+  const fab=document.getElementById('newInstFab').value.trim();
+  const mod=document.getElementById('newInstMod').value.trim();
+  const ser=document.getElementById('newInstSer').value.trim()||'—';
+  const cal=document.getElementById('newInstCal').value.trim()||'—';
+  if(!fab||!mod) return;
+  state.instruments.push({id:'i'+Date.now(), fab, mod, ser, cal});
+  document.getElementById('newInstFab').value='';
+  document.getElementById('newInstMod').value='';
+  document.getElementById('newInstSer').value='';
+  document.getElementById('newInstCal').value='';
+  renderConfigLists(); markDirty();
+}
+function removeInstrument(i){ state.instruments.splice(i,1); renderConfigLists(); markDirty(); }
+
+/* ---------------- RAW PARSING (round import) ---------------- */
+function parseRaw(){
+  const text = document.getElementById('rawInput').value;
+  const lines = text.split(/\r?\n/);
+  const points = {};
+  const pending = [];
+  const numRe = /^-?\d+(?:[.,]\d+)?$/;
+
+  lines.forEach((line, idx)=>{
+    const raw = line.trim();
+    if(!raw) return;
+    let parts = raw.split(/[\t;]+/).length>1 ? raw.split(/[\t;]+/) : raw.split(/\s*,\s*|\s+/);
+    parts = parts.map(p=>p.trim()).filter(p=>p!=='');
+    if(parts.length < 4) return;
+    const code = parts[0];
+    const rest = parts.slice(1,4);
+    const vals = [];
+    let hasIssue = false;
+    rest.forEach(v=>{
+      const cleaned = v.replace(',', '.');
+      if(numRe.test(v) || /^-?\d+\.\d+$/.test(cleaned)){
+        vals.push(parseFloat(cleaned));
+      } else {
+        hasIssue = true;
+        vals.push(null);
+      }
+    });
+    if(hasIssue){
+      pending.push({code, raw, line: idx+1, reason: 'Format numérique invalide (ex. virgules multiples) — valeur non interprétable automatiquement'});
+      return;
+    }
+    const [v1,v2,v3] = vals;
+    const colOrder = document.getElementById('importColOrder').value;
+    const n = colOrder==='PENZ' ? v2 : v1;
+    const e = colOrder==='PENZ' ? v1 : v2;
+    const z = v3;
+    points[code] = {n,e,z};
+  });
+
+  pendingParse = { points, pending, mapping: {}, sourceText: text, sourceFileName: lastFileName['rawInput'] || null };
+  document.getElementById('parseSummary').textContent = `${Object.keys(points).length} code(s) reconnu(s), ${pending.length} ligne(s) en attente de validation.`;
+  renderMapping();
+}
+function stripMon(code){
+  return code.replace(/^mon[-_]?/i,'').replace(/[-_]?mon$/i,'');
+}
+function allTargets(){ const s=cur(); return [...s.points, ...s.refPoints]; }
+function guessCanonical(code){
+  const s = cur();
+  if(s.pointMapping[code]) return s.pointMapping[code];
+  const base = stripMon(code);
+  if(s.pointMapping[base]) return s.pointMapping[base];
+  // Safe, unambiguous guesses only — no coincidental digit matching (e.g. "MON1" must never silently guess "REF1"
+  // just because both reduce to the digit "1"). Only an exact literal match to an existing canonical name is trusted.
+  if(allTargets().includes(code)) return code;
+  if(allTargets().includes(base)) return base;
+  return '';
+}
+function mappingRow(code, guess){
+  const opts = ['<option value="">— ignorer —</option>'].concat(
+    allTargets().map(p=>`<option value="${p}" ${p===guess?'selected':''}>${p}</option>`)
+  ).join('');
+  const v = pendingParse.points[code];
+  return `<div class="rowline" style="margin-bottom:8px;">
+    <div class="small mono" style="flex:1.4;">${code} <span style="color:var(--ink-soft)">(N ${fmtCoord(v.n)}, E ${fmtCoord(v.e)}, Z ${fmtCoord(v.z)})</span></div>
+    <select onchange="setMapping('${code}', this.value)">${opts}</select>
+  </div>`;
+}
+function renderMapping(){
+  const card = document.getElementById('mappingCard');
+  if(!pendingParse){ card.style.display='none'; return; }
+  card.style.display='block';
+  const box = document.getElementById('mappingList');
+  const codes = Object.keys(pendingParse.points);
+  codes.forEach(c=>{ if(pendingParse.mapping[c]===undefined) pendingParse.mapping[c]=guessCanonical(c); });
+  const measures = codes.filter(c=> /mon/i.test(c));
+  const baseline = codes.filter(c=> !measures.includes(c));
+
+  box.innerHTML = (measures.length? measures.map(c=>mappingRow(c, pendingParse.mapping[c])).join('') : '<p class="small">Aucun code de mesure (avec MON) détecté dans ce fichier.</p>')
+    + (baseline.length ? `<details style="margin-top:10px;"><summary class="small" style="cursor:pointer;">Valeurs étalons/théoriques détectées (${baseline.length}) — non importées comme mesure de ronde, affichage informatif seulement</summary>
+        <div style="margin-top:8px;">${baseline.map(c=>mappingRow(c, pendingParse.mapping[c])).join('')}</div>
+      </details>` : '');
+
+  const anomBox = document.getElementById('anomalyBox');
+  if(pendingParse.pending.length){
+    anomBox.style.display='block';
+    anomBox.innerHTML = `<strong>À valider avant intégration :</strong><br>` +
+      pendingParse.pending.map(p=>`Ligne ${p.line} — code « ${p.code} » — "${p.raw}" — ${p.reason}`).join('<br>') +
+      `<br><span class="small">Ces lignes ne seront pas incluses au calcul tant qu'elles ne sont pas corrigées manuellement dans le fichier source et réimportées.</span>`;
+  } else {
+    anomBox.style.display='none';
+  }
+}
+function setMapping(code, val){
+  pendingParse.mapping[code] = val;
+  if(val){
+    const s = cur();
+    s.pointMapping[code] = val;
+    s.pointMapping[stripMon(code)] = val;
+  }
+}
+function commitRound(){
+  if(!pendingParse) return;
+  const s = cur();
+  const date = document.getElementById('importDate').value;
+  let instrumentId = document.getElementById('importInstrument').value;
+  const operateur = document.getElementById('importOperateur').value.trim() || state.config.resp || '';
+  if(!date){ alert('Indiquez la date de la ronde.'); return; }
+  if(instrumentId==='__new__'){ alert("Ajoutez d'abord l'instrument dans l'onglet Configuration."); return; }
+
+  const roundPoints = {};
+  const dupPending = [];
+  Object.keys(pendingParse.points).forEach(code=>{
+    if(!/mon/i.test(code)) return;
+    const target = pendingParse.mapping[code];
+    if(!target) return;
+    const v = pendingParse.points[code];
+    if(roundPoints[target]){
+      const prev = roundPoints[target];
+      const diffMax = Math.max(Math.abs(prev.n-v.n), Math.abs(prev.e-v.e), Math.abs(prev.z-v.z));
+      if(diffMax > 0.001){
+        dupPending.push({code, raw:`${code} vs valeur déjà retenue pour ${target}`, reason:`Doublon divergent pour ${target} (écart ${(diffMax*1000).toFixed(1)} mm) — valeur ignorée, à valider manuellement`});
+      }
+      return;
+    }
+    roundPoints[target] = v;
+  });
+  if(Object.keys(roundPoints).length===0){ alert("Aucun point mappé — vérifiez la correspondance."); return; }
+
+  s.rounds.push({
+    id: 'r'+Date.now(),
+    date, instrumentId, operateur,
+    note: '',
+    isReference: !s.rounds.some(r=>r.isReference),
+    points: roundPoints,
+    pendingRaw: pendingParse.pending.concat(dupPending),
+    sourceText: pendingParse.sourceText || null,
+    sourceFileName: pendingParse.sourceFileName || null
+  });
+  s.rounds.sort((a,b)=> a.date.localeCompare(b.date));
+
+  pendingParse = null;
+  document.getElementById('rawInput').value='';
+  document.getElementById('parseSummary').textContent='Ronde ajoutée.';
+  document.getElementById('mappingCard').style.display='none';
+  const ivWrap = document.getElementById('importLineViewerWrap'); if(ivWrap) ivWrap.style.display='none';
+  renderRondes();
+  markDirty();
+}
+
+/* ---------------- ÉTALON: labelled coordinate file import ---------------- */
+let pendingEtalon = null;
+
+function toggleEtalonLock(checked){
+  const s = cur();
+  const box = document.getElementById('etalonLockCheckbox');
+  if(checked){
+    if(!confirm("Verrouiller les valeurs étalons ? Aucun import de levé étalon ni changement de ronde étalon ne sera possible tant que vous n'aurez pas déverrouillé explicitement.")){
+      box.checked = false; return;
+    }
+    s.etalonLocked = true;
+  } else {
+    if(!confirm("Déverrouiller les valeurs étalons ? Elles pourront de nouveau être importées ou remplacées.")){
+      box.checked = true; return;
+    }
+    s.etalonLocked = false;
+  }
+  markDirty();
+  renderEtalon();
+  renderRondes();
+}
+function analyzeEtalonFile(){
+  const s = cur();
+  if(s.etalonLocked){
+    document.getElementById('etalonImportSummary').textContent = "Les valeurs étalons sont verrouillées — décochez « Valeurs étalons vérifiées » ci-dessous pour pouvoir en importer de nouvelles.";
+    return;
+  }
+  const text = document.getElementById('etalonRawInput').value;
+  const colOrder = document.getElementById('etalonColOrder').value;
+  const lines = text.split(/\r?\n/);
+  const rows = [];
+  const pending = [];
+
+  lines.forEach((line, idx)=>{
+    const raw = line.trim();
+    if(!raw) return;
+    let parts = raw.split(/\s*,\s*/).map(p=>p.trim()).filter(p=>p!=='');
+    if(parts.length < 4){ return; } // needs at least Point,coord,coord,coord
+    const code = parts[0];
+    const nStr = parts[1], eStr = parts[2], zStr = parts[3];
+    const label = parts.length>=5 ? parts[4] : null;
+    const v1 = parseFloat(nStr.replace(',','.')), v2 = parseFloat(eStr.replace(',','.')), z = parseFloat(zStr.replace(',','.'));
+    if(isNaN(v1)||isNaN(v2)||isNaN(z)){
+      pending.push({code, raw, line: idx+1, reason:'Coordonnée non interprétable'});
+      return;
+    }
+    const n = colOrder==='PENZ' ? v2 : v1;
+    const e = colOrder==='PENZ' ? v1 : v2;
+
+    let canonical, isRef;
+    if(label){
+      isRef = /^ref/i.test(label);
+      canonical = isRef ? label : stripMon(label);
+    } else {
+      const guess = guessCanonical(code);
+      if(guess){ canonical = guess; isRef = s.refPoints.includes(guess); }
+      else { canonical = stripMon(code); isRef = false; }
+    }
+    rows.push({code, n, e, z, canonical, role: isRef ? 'ref' : 'mon'});
+  });
+
+  pendingEtalon = { rows, pending, sourceText: text, sourceFileName: lastFileName['etalonRawInput'] || null };
+  document.getElementById('etalonImportSummary').textContent = `${rows.length} ligne(s) reconnue(s), ${pending.length} ligne(s) en attente de validation.`;
+  renderEtalonClassify();
+}
+
+function renderEtalonClassify(){
+  const card = document.getElementById('etalonClassifyCard');
+  if(!pendingEtalon || pendingEtalon.rows.length===0){ card.style.display='none'; return; }
+  card.style.display='block';
+  const box = document.getElementById('etalonClassifyList');
+  box.innerHTML = pendingEtalon.rows.map((r,i)=>`
+    <div class="rowline" style="margin-bottom:8px;">
+      <div class="small mono" style="flex:1;">${r.code} <span style="color:var(--ink-soft)">(N ${fmtCoord(r.n)}, E ${fmtCoord(r.e)}, Z ${fmtCoord(r.z)})</span></div>
+      <input type="text" style="flex:0.8;" value="${r.canonical}" onchange="pendingEtalon.rows[${i}].canonical=this.value">
+      <select style="flex:0.8;" onchange="pendingEtalon.rows[${i}].role=this.value">
+        <option value="mon" ${r.role==='mon'?'selected':''}>Point de monitoring</option>
+        <option value="ref" ${r.role==='ref'?'selected':''}>Point de référence</option>
+        <option value="ignore" ${r.role==='ignore'?'selected':''}>Ignorer</option>
+      </select>
+    </div>`).join('');
+  if(pendingEtalon.pending.length){
+    box.innerHTML += `<div class="pending"><strong>À valider :</strong><br>` +
+      pendingEtalon.pending.map(p=>`Ligne ${p.line} — code « ${p.code} » — "${p.raw}" — ${p.reason}`).join('<br>') + `</div>`;
+  }
+}
+
+function confirmEtalonImport(){
+  if(!pendingEtalon) return;
+  const s = cur();
+  if(s.etalonLocked){ alert("Les valeurs étalons sont verrouillées. Décochez « Valeurs étalons vérifiées » dans l'onglet Étalon avant de les modifier."); return; }
+  const date = document.getElementById('etalonImportDate').value;
+  const instrumentId = document.getElementById('etalonImportInstrument').value;
+  const operateur = document.getElementById('etalonImportOperateur').value.trim() || state.config.resp || '';
+  if(!date){ alert('Indiquez la date du levé.'); return; }
+  if(instrumentId==='__new__'){ alert("Ajoutez d'abord l'instrument dans l'onglet Configuration."); return; }
+
+  const roundPoints = {};
+  let addedMon = 0, addedRef = 0;
+  pendingEtalon.rows.forEach(r=>{
+    if(r.role==='ignore' || !r.canonical) return;
+    if(r.role==='ref'){ if(!s.refPoints.includes(r.canonical)){ s.refPoints.push(r.canonical); addedRef++; } }
+    else { if(!s.points.includes(r.canonical)){ s.points.push(r.canonical); addedMon++; } }
+    roundPoints[r.canonical] = {n:r.n, e:r.e, z:r.z};
+  });
+  if(Object.keys(roundPoints).length===0){
+    document.getElementById('etalonImportSummary').textContent = "Aucun point retenu — vérifiez la classification.";
+    return;
+  }
+
+  s.rounds.forEach(r=> r.isReference=false);
+  s.rounds.push({
+    id: 'r'+Date.now(),
+    date, instrumentId, operateur,
+    note: 'Levé étalon de référence',
+    isReference: true,
+    points: roundPoints,
+    pendingRaw: pendingEtalon.pending,
+    sourceText: pendingEtalon.sourceText || null,
+    sourceFileName: pendingEtalon.sourceFileName || null
+  });
+  s.rounds.sort((a,b)=> a.date.localeCompare(b.date));
+
+  document.getElementById('etalonImportSummary').textContent =
+    `Étalon défini : ${Object.keys(roundPoints).length} point(s) (${addedMon} point(s) de monitoring et ${addedRef} point(s) de référence ajoutés à la structure).`;
+  document.getElementById('etalonRawInput').value='';
+  document.getElementById('etalonClassifyCard').style.display='none';
+  const evWrap = document.getElementById('etalonLineViewerWrap'); if(evWrap) evWrap.style.display='none';
+  pendingEtalon = null;
+  renderConfigLists();
+  renderEtalon();
+  markDirty();
+}
+
+/* ---------------- FILE PICKER + LINE VIEWER (round import & étalon import) ---------------- */
+const __viewerState = {};
+let lastFileName = {};
+function fileToViewer(file, textareaId, viewerId){
+  if(!file) return;
+  lastFileName[textareaId] = file.name;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.getElementById(textareaId).value = e.target.result;
+    rebuildViewer(textareaId, viewerId);
+  };
+  reader.readAsText(file);
+}
+function syncViewerFromTextarea(textareaId, viewerId){ rebuildViewer(textareaId, viewerId); }
+function rebuildViewer(textareaId, viewerId){
+  const text = document.getElementById(textareaId).value;
+  const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
+  __viewerState[viewerId] = lines;
+  renderViewerLines(textareaId, viewerId);
+}
+function renderViewerLines(textareaId, viewerId){
+  const lines = __viewerState[viewerId] || [];
+  const wrap = document.getElementById(viewerId+'Wrap');
+  const box = document.getElementById(viewerId);
+  if(!box) return;
+  if(lines.length===0){ if(wrap) wrap.style.display='none'; return; }
+  if(wrap) wrap.style.display='block';
+  box.innerHTML = lines.map((l,i)=>`<div class="rowline" style="margin-bottom:4px;align-items:center;">
+    <div class="small mono" style="flex:1;">${l.replace(/</g,'&lt;')}</div>
+    <button class="icon-x" onclick="removeViewerLine('${textareaId}','${viewerId}',${i})">✕</button>
+  </div>`).join('');
+}
+function removeViewerLine(textareaId, viewerId, idx){
+  const lines = __viewerState[viewerId] || [];
+  lines.splice(idx,1);
+  document.getElementById(textareaId).value = lines.join('\n');
+  renderViewerLines(textareaId, viewerId);
+}
+
+/* ---------------- RONDES TAB ---------------- */
+function renderRondes(){
+  const s = cur();
+  const box = document.getElementById('rondesList');
+  if(s.rounds.length===0){ box.innerHTML='<p class="small">Aucune ronde importée pour le moment.</p>'; return; }
+  box.innerHTML = s.rounds.map((r,i)=>{
+    const inst = state.instruments.find(x=>x.id===r.instrumentId);
+    const instLabel = inst? `${inst.fab} ${inst.mod}` : '—';
+    const pendingNote = r.pendingRaw && r.pendingRaw.length
+      ? `<div class="pending"><strong>Non validé :</strong> ${r.pendingRaw.map(p=>`code « ${p.code} »`).join(', ')} — exclu(s) du calcul.</div>` : '';
+    if(VIEW_ONLY){
+      return `<div class="card" style="margin-bottom:10px;">
+        <div class="rowline">
+          <div><label>Date</label><div class="mono">${r.date}</div></div>
+          <div><label>Instrument</label><div class="mono">${instLabel}</div></div>
+          <div><label>Opérateur</label><div class="mono">${(r.operateur||'—')}</div></div>
+          <div><label>Étalon de référence</label><div class="mono">${r.isReference?'Oui':'—'}</div></div>
+        </div>
+        <div class="small mono" style="margin-top:6px;">Points : ${Object.keys(r.points).join(', ')}</div>
+        ${pendingNote}
+        ${r.note ? `<div class="field" style="margin-top:8px;"><label>Note</label><div class="small mono">${r.note}</div></div>` : ''}
+      </div>`;
+    }
+    return `<div class="card" style="margin-bottom:10px;">
+      <div class="rowline">
+        <div><label>Date</label><div class="mono">${r.date}</div></div>
+        <div><label>Instrument</label><div class="mono">${instLabel}</div></div>
+        <div><label>Opérateur</label><input type="text" value="${(r.operateur||'').replace(/"/g,'&quot;')}" onchange="setOperateur(${i}, this.value)"></div>
+        <div><label>Étalon de référence</label>
+          <input type="radio" name="refRound" ${r.isReference?'checked':''} ${s.etalonLocked?'disabled':''} onchange="setReference(${i})"> utiliser comme étalon
+        </div>
+      </div>
+      <div class="small mono" style="margin-top:6px;">Points : ${Object.keys(r.points).join(', ')}</div>
+      ${r.sourceText ? `<button class="btn secondary" style="margin-top:6px;padding:4px 10px;font-size:11.5px;" onclick="downloadRoundSource(${i})">📄 ${r.sourceFileName ? 'Fichier source ('+r.sourceFileName+')' : 'Télécharger le fichier source'}</button>` : ''}
+      ${pendingNote}
+      <div class="field" style="margin-top:8px;">
+        <label>Note (équipement à proximité, conditions, etc.)</label>
+        <input type="text" value="${r.note.replace(/"/g,'&quot;')}" onchange="setNote(${i}, this.value)" placeholder="ex. génératrice en fonction près des mesures">
+      </div>
+      ${r.isReference && s.etalonLocked
+        ? '<span class="badge ok">🔒 Étalon verrouillé — non supprimable</span>'
+        : `<button class="icon-x" onclick="deleteRound(${i})">✕ Supprimer cette ronde</button>`}
+    </div>`;
+  }).join('');
+}
+function downloadRoundSource(i){
+  const s = cur();
+  const r = s.rounds[i];
+  if(!r || !r.sourceText) return;
+  const blob = new Blob([r.sourceText], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = r.sourceFileName || `ronde_${r.date}.txt`;
+  a.click();
+}
+function setReference(i){
+  const s=cur();
+  if(s.etalonLocked){ alert("Les valeurs étalons sont verrouillées. Décochez « Valeurs étalons vérifiées » dans l'onglet Étalon avant de changer la ronde étalon."); renderRondes(); return; }
+  s.rounds.forEach((r,j)=> r.isReference = (j===i)); renderRondes(); markDirty();
+}
+function setNote(i,v){ cur().rounds[i].note = v; markDirty(); }
+function setOperateur(i,v){ cur().rounds[i].operateur = v; markDirty(); }
+function deleteRound(i){
+  const s=cur();
+  const r = s.rounds[i];
+  if(r.isReference && s.etalonLocked){
+    alert("Cette ronde est la référence étalon et elle est verrouillée. Décochez « Valeurs étalons vérifiées » dans l'onglet Étalon avant de pouvoir la supprimer.");
+    return;
+  }
+  if(r.isReference && !s.etalonLocked){
+    if(!confirm("Cette ronde sert actuellement d'étalon de référence. La supprimer effacera les valeurs étalons de la structure. Continuer ?")) return;
+  }
+  s.rounds.splice(i,1);
+  if(s.rounds.length && !s.rounds.some(r=>r.isReference)) s.rounds[0].isReference=true;
+  renderRondes(); markDirty();
+}
+
+/* ---------------- ÉTALON TAB (view/control) ---------------- */
+function renderEtalon(){
+  readConfigSafe();
+  const s = cur();
+  const ref = s.rounds.find(r=>r.isReference);
+  const infoBox = document.getElementById('etalonInfoBox');
+  const monBox = document.getElementById('etalonMonBox');
+  const refBox = document.getElementById('etalonRefBox');
+  const axeBox = document.getElementById('etalonAxeBox');
+  const lockBox = document.getElementById('etalonLockCheckbox');
+  if(lockBox) lockBox.checked = !!s.etalonLocked;
+
+  if(!ref){
+    infoBox.innerHTML = '<p class="small">Aucune ronde n\'est désignée comme étalon — importez un levé ci-dessus, ou allez dans l\'onglet Rondes pour en désigner une.</p>';
+    monBox.innerHTML=''; refBox.innerHTML=''; axeBox.innerHTML='';
+    return;
+  }
+  const inst = state.instruments.find(i=>i.id===ref.instrumentId);
+  infoBox.innerHTML = (s.etalonLocked ? `<div class="banner ok" style="margin-bottom:10px;">🔒 Valeurs étalons verrouillées et vérifiées.</div>` : `<div class="banner warn" style="margin-bottom:10px;">Valeurs étalons non verrouillées — encore modifiables.</div>`) + `<table class="data">
+    <tr><th class="left">Date</th><th class="left">Instrument</th><th class="left">Opérateur</th><th class="left">Note</th></tr>
+    <tr><td class="left mono">${ref.date}</td><td class="left mono">${inst? inst.fab+' '+inst.mod+' (série '+inst.ser+', '+inst.cal+')' : '—'}</td><td class="left mono">${ref.operateur||'—'}</td><td class="left">${ref.note||'—'}</td></tr>
+  </table>`;
+
+  function pointTable(list){
+    const rows = list.map(pt=>{
+      const v = ref.points[pt];
+      if(!v) return `<tr><td class="left">${pt}</td><td colspan="3"><span class="badge danger">ABSENT DE L'ÉTALON</span></td></tr>`;
+      return `<tr><td class="left">${pt}</td><td>${fmtCoord(v.n)}</td><td>${fmtCoord(v.e)}</td><td>${fmtCoord(v.z)}</td></tr>`;
+    }).join('');
+    return `<table class="data"><tr><th class="left">Point</th><th>Nord</th><th>Est</th><th>Z (m)</th></tr>${rows}</table>`;
+  }
+  monBox.innerHTML = s.points.length ? pointTable(s.points) : '<p class="small">Aucun point de monitoring configuré.</p>';
+  refBox.innerHTML = s.refPoints.length ? pointTable(s.refPoints) : '<p class="small">Aucun point de référence configuré.</p>';
+
+  const A = s.axeA, B = s.axeB;
+  const pA = ref.points[A], pB = ref.points[B];
+  if(!pA || !pB){
+    axeBox.innerHTML = `<p class="small">Impossible de calculer l'axe — ${!pA?`« ${A} » `:''}${!pB?`« ${B} » `:''}absent de l'étalon.</p>`;
+  } else {
+    const dN=pB.n-pA.n, dE=pB.e-pA.e;
+    const dist = Math.hypot(dN,dE);
+    let brg = Math.atan2(dE,dN)*180/Math.PI; if(brg<0) brg+=360;
+    axeBox.innerHTML = `<table class="data">
+      <tr><th class="left">Origine (${A})</th><th class="left">Extrémité (${B})</th><th>Longueur (m)</th><th>Gisement (°)</th></tr>
+      <tr><td class="left mono">N ${fmtCoord(pA.n)}, E ${fmtCoord(pA.e)}</td><td class="left mono">N ${fmtCoord(pB.n)}, E ${fmtCoord(pB.e)}</td><td>${dist.toFixed(3)}</td><td>${brg.toFixed(2)}</td></tr>
+    </table>`;
+  }
+}
+function readConfigSafe(){
+  // like readConfig, but safe to call from tabs where the config inputs still reflect the active structure
+  if(document.getElementById('cfgClient')) readConfig();
+}
+
+/* ---------------- COMPUTATION ENGINE ---------------- */
+function project(dN, dE, unit){
+  const pm = dN*unit.n + dE*unit.e;
+  const ec = (-dN*unit.e) + dE*unit.n;
+  return {pm, ec};
+}
+function computeAll(){
+  const s = cur();
+  const ref = s.rounds.find(r=>r.isReference);
+  const A = s.axeA, B = s.axeB;
+  if(!ref || !ref.points[A] || !ref.points[B]) return null;
+  const pA = ref.points[A], pB = ref.points[B];
+  const dxN = pB.n - pA.n, dxE = pB.e - pA.e;
+  const len = Math.hypot(dxN, dxE) || 1;
+  const unit = {n: dxN/len, e: dxE/len};
+
+  const sortedRounds = [...s.rounds].sort((a,b)=>a.date.localeCompare(b.date));
+  const results = {};
+  s.points.forEach(pt=>{
+    results[pt] = sortedRounds.map(r=>{
+      if(!r.points[pt] || !ref.points[pt]) return null;
+      const _dN = r.points[pt].n - ref.points[pt].n;
+      const _dE = r.points[pt].e - ref.points[pt].e;
+      const {pm, ec} = project(_dN, _dE, unit);
+      const dZ = r.points[pt].z - ref.points[pt].z;
+      return {date:r.date, ec: ec*1000, pm: pm*1000, dZ: dZ*1000, z: r.points[pt].z, dN: _dN*1000, dE: _dE*1000};
+    });
+  });
+  return {ref, sortedRounds, results, unit};
+}
+function flagFor(ec){
+  const s = cur();
+  const a = Math.abs(ec);
+  if(a > s.rouge) return 'rouge';
+  if(a > s.jaune) return 'jaune';
+  return 'vert';
+}
+function trendFor(cur_, prev, eps){
+  if(prev===null || prev===undefined) return 'flat';
+  const d = Math.abs(cur_) - Math.abs(prev);
+  if(Math.abs(d) <= eps) return 'flat';
+  return d > 0 ? 'up' : 'down';
+}
+function computeRefStability(cutoffDate){
+  const s = cur();
+  const ref = s.rounds.find(r=>r.isReference);
+  if(!ref) return null;
+  let sortedRounds = [...s.rounds].sort((a,b)=>a.date.localeCompare(b.date));
+  if(cutoffDate) sortedRounds = sortedRounds.filter(r=> r.isReference || r.date<=cutoffDate);
+  const out = {};
+  s.refPoints.forEach(pt=>{
+    if(!ref.points[pt]) { out[pt]=null; return; }
+    out[pt] = sortedRounds.map(r=>{
+      if(!r.points[pt]) return null;
+      const dN=(r.points[pt].n-ref.points[pt].n)*1000, dE=(r.points[pt].e-ref.points[pt].e)*1000, dZ=(r.points[pt].z-ref.points[pt].z)*1000;
+      const mag = Math.hypot(dN,dE);
+      return {date:r.date, dN, dE, dZ, mag};
+    });
+  });
+  return {sortedRounds, out};
+}
+
+/* ---------------- RESULTS RENDER ---------------- */
+function truncateData(data, cutoffDate){
+  // "back-tracker" a report to a given round = show the étalon (always, regardless of its
+  // own date) plus every monitoring round dated on/before that round — never later ones.
+  const keepIdx = [];
+  data.sortedRounds.forEach((r,i)=>{ if(r.isReference || r.date<=cutoffDate) keepIdx.push(i); });
+  const sortedRounds = keepIdx.map(i=>data.sortedRounds[i]);
+  const results = {};
+  Object.keys(data.results).forEach(pt=>{ results[pt] = keepIdx.map(i=>data.results[pt][i]); });
+  return {...data, sortedRounds, results};
+}
+function renderResults(){
+  const s = cur();
+  syncRoundSelectors();
+  let data = computeAll();
+  const box = document.getElementById('resultsTableBox');
+  const zBox = document.getElementById('zTableBox');
+  const bannerBox = document.getElementById('bannerBox');
+  const axeBox = document.getElementById('axeUsedBox');
+  if(axeBox) axeBox.innerHTML = `<b>Axe PM utilisé pour les calculs :</b> ${s.axeA} → ${s.axeB}`;
+  if(!data || data.sortedRounds.length===0){
+    box.innerHTML = '<p class="small">Aucune donnée à afficher — importez au moins une ronde et désignez un étalon.</p>';
+    zBox.innerHTML=''; bannerBox.innerHTML='';
+    document.getElementById('refTableBox').innerHTML='';
+    return;
+  }
+  let curIdx = currentRoundIndex(data.sortedRounds);
+  let cutoffDate = null;
+  if(s.viewRoundId && data.sortedRounds[curIdx]){
+    cutoffDate = data.sortedRounds[curIdx].date;
+    data = truncateData(data, cutoffDate);
+    curIdx = currentRoundIndex(data.sortedRounds);
+  }
+  const prevIdx = previousNonRefIndex(data.sortedRounds, curIdx);
+  let worst = 'vert';
+
+  let rows = '';
+  s.points.forEach(pt=>{
+    const series = data.results[pt];
+    const c = series[curIdx];
+    if(!c){ rows += `<tr><td class="left">${pt}</td><td colspan="7">Pas de mesure à la ronde courante</td></tr>`; return; }
+    const prev = prevIdx>=0 ? series[prevIdx] : null;
+    const flag = flagFor(c.ec);
+    if(flag==='rouge') worst='rouge'; else if(flag==='jaune' && worst!=='rouge') worst='jaune';
+    const trend = trendFor(c.ec, prev? prev.ec : null, s.trendEps);
+    const trendCls = trend==='up'?'trend-up':trend==='down'?'trend-down':'trend-flat';
+    rows += `<tr class="flag-${flag}">
+      <td class="left">${pt}</td>
+      <td class="ec">${c.ec.toFixed(2)}</td>
+      <td>${c.pm.toFixed(2)}</td>
+      <td>${prev? prev.ec.toFixed(2): '—'}</td>
+      <td>${prev? prev.pm.toFixed(2): '—'}</td>
+      <td class="${trendCls}"></td>
+      <td>${fmtCoord(c.z)}</td>
+      <td><span class="badge ${flag==='vert'?'ok':flag==='jaune'?'warn':'danger'}">${flag.toUpperCase()}</span></td>
+    </tr>`;
+  });
+  box.innerHTML = `<table class="data">
+    <tr><th class="left">Point</th><th>EC init (mm)</th><th>PM init (mm)</th><th>EC préc (mm)</th><th>PM préc (mm)</th><th>Tendance</th><th>Z actuel (m)</th><th>Statut</th></tr>
+    ${rows}
+  </table>`;
+
+  const bannerCls = worst==='vert'?'ok':worst==='jaune'?'warn':'danger';
+  const bannerTxt = worst==='vert' ? 'TRAVAUX AUTORISÉS — Tous les EC sont dans les tolérances.'
+    : worst==='jaune' ? 'À VÉRIFIER — Au moins un EC approche le seuil de tolérance.'
+    : 'ARRÊT DES TRAVAUX — Au moins un EC dépasse le seuil rouge.';
+  const retroNote = cutoffDate ? `<div class="banner warn">Vue rétroactive — données reconstruites en date du ${cutoffDate} (rondes ultérieures exclues des graphiques et tableaux).</div>` : '';
+  bannerBox.innerHTML = `${retroNote}<div class="banner ${bannerCls}">${bannerTxt}</div>`;
+
+  let zRows = '';
+  s.points.forEach(pt=>{
+    const series = data.results[pt];
+    zRows += `<tr><td class="left">${pt}</td>` + data.sortedRounds.map((r,i)=>{
+      if(r.isReference){
+        const zv = data.ref.points[pt] ? fmtCoord(data.ref.points[pt].z) : '—';
+        return `<td>${zv}</td>`;
+      }
+      const v = series[i];
+      return `<td>${v? v.dZ.toFixed(2) : '—'}</td>`;
+    }).join('') + '</tr>';
+  });
+  const zHeaders = data.sortedRounds.map(r=> r.isReference ? 'Z étalon (m)' : r.date);
+  zBox.innerHTML = `<table class="data"><tr><th class="left">Point</th>${zHeaders.map(h=>`<th>${h}</th>`).join('')}</tr>${zRows}</table>`;
+
+  const refBox = document.getElementById('refTableBox');
+  const refData = computeRefStability(cutoffDate);
+  if(!refData || s.refPoints.length===0){
+    refBox.innerHTML = '<p class="small">Aucun point de référence configuré.</p>';
+  } else {
+    const curR = currentRoundIndex(refData.sortedRounds);
+    let anyUnstable = false;
+    const rrows = s.refPoints.map(pt=>{
+      const series = refData.out[pt];
+      if(!series || !series[curR]) return `<tr><td class="left">${pt}</td><td colspan="4">—</td></tr>`;
+      const c = series[curR];
+      const flag = flagFor(c.mag);
+      if(flag!=='vert') anyUnstable = true;
+      return `<tr class="flag-${flag}"><td class="left">${pt}</td><td class="ec">${c.mag.toFixed(2)}</td><td>${c.dN.toFixed(2)}</td><td>${c.dE.toFixed(2)}</td><td>${c.dZ.toFixed(2)}</td></tr>`;
+    }).join('');
+    refBox.innerHTML = (anyUnstable ? `<div class="banner warn">Point(s) de référence en mouvement — valider la stabilité du réseau avant de conclure sur la structure.</div>` : '') +
+      `<table class="data"><tr><th class="left">Point</th><th>Déplacement (mm)</th><th>ΔN (mm)</th><th>ΔE (mm)</th><th>ΔZ (mm)</th></tr>${rrows}</table>`;
+  }
+
+  drawBarChart(data, curIdx);
+  drawLineChart(data);
+  renderPointDiagrams(data);
+  renderPendageTable(data, curIdx);
+  window.__lastComputed = data;
+}
+
+function drawBarChart(data, curIdx){
+  const s = cur();
+  const cv = document.getElementById('chartBar');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const pts = s.points;
+  const vals = pts.map(p=> data.results[p][curIdx] ? data.results[p][curIdx].ec : 0);
+  const maxV = Math.max(s.rouge*1.3, ...vals.map(v=>Math.abs(v)), 1);
+  const w=cv.width, h=cv.height, midY=h/2, padL=50, padR=20;
+  const plotW = w-padL-padR;
+  const barW = plotW/pts.length*0.55;
+  const scale = (h/2-30)/maxV;
+
+  ctx.strokeStyle='#DAD6CC'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(padL,midY); ctx.lineTo(w-padR,midY); ctx.stroke();
+  [s.jaune, -s.jaune].forEach(t=>{
+    ctx.strokeStyle='#C98A2B'; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL, midY - t*scale); ctx.lineTo(w-padR, midY - t*scale); ctx.stroke();
+  });
+  [s.rouge, -s.rouge].forEach(t=>{
+    ctx.strokeStyle='#B23A2E'; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL, midY - t*scale); ctx.lineTo(w-padR, midY - t*scale); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  pts.forEach((p,i)=>{
+    const x = padL + i*(plotW/pts.length) + (plotW/pts.length-barW)/2;
+    const v = vals[i];
+    const barH = Math.abs(v)*scale;
+    const y = v>=0 ? midY-barH : midY;
+    const flag = flagFor(v);
+    ctx.fillStyle = flag==='vert'?'#2E7D46':flag==='jaune'?'#C98A2B':'#B23A2E';
+    ctx.fillRect(x,y,barW,barH);
+    ctx.fillStyle='#22262B'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText((v>=0?'+':'')+v.toFixed(2), x+barW/2, v>=0? y-6 : y+barH+14);
+    ctx.fillText(p, x+barW/2, midY+ (v>=0? 16: -barH-10) + (v>=0?0:0) );
+  });
+  ctx.fillStyle='#5B6570'; ctx.font='12px IBM Plex Sans'; ctx.textAlign='left';
+  ctx.fillText('EC (mm)', 8, 16);
+}
+
+function drawLineChart(data){
+  const s = cur();
+  const cv = document.getElementById('chartLine');
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const w=cv.width,h=cv.height,padL=50,padR=140,padT=20,padB=30;
+  const rounds = data.sortedRounds;
+  if(rounds.length<2){ ctx.fillStyle='#5B6570'; ctx.fillText('Au moins 2 rondes nécessaires', 20,20); return; }
+  const maxV = Math.max(s.rouge*1.3, 1, ...s.points.flatMap(p=>data.results[p].filter(Boolean).map(v=>Math.abs(v.ec))));
+  const plotW = w-padL-padR, plotH = h-padT-padB, midY = padT+plotH/2;
+  const scaleX = plotW/(rounds.length-1);
+  const scaleY = (plotH/2)/maxV;
+  const colors = ['#1C2B39','#C98A2B','#2E7D46','#B23A2E','#5B6570','#8E5A2B'];
+
+  ctx.strokeStyle='#DAD6CC';
+  ctx.beginPath(); ctx.moveTo(padL,midY); ctx.lineTo(w-padR,midY); ctx.stroke();
+
+  [s.jaune,-s.jaune].forEach(t=>{
+    ctx.strokeStyle='#C98A2B'; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL, midY-t*scaleY); ctx.lineTo(w-padR, midY-t*scaleY); ctx.stroke();
+  });
+  [s.rouge,-s.rouge].forEach(t=>{
+    ctx.strokeStyle='#B23A2E'; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(padL, midY-t*scaleY); ctx.lineTo(w-padR, midY-t*scaleY); ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  s.points.forEach((p,pi)=>{
+    ctx.strokeStyle = colors[pi%colors.length];
+    ctx.lineWidth=1.6;
+    ctx.beginPath();
+    let started=false;
+    data.results[p].forEach((v,i)=>{
+      if(!v) return;
+      const x = padL+i*scaleX, y = midY - v.ec*scaleY;
+      if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+    ctx.fillStyle=colors[pi%colors.length];
+    ctx.fillRect(w-padR+10, padT+pi*18, 10,10);
+    ctx.fillStyle='#22262B'; ctx.font='11px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillText(p, w-padR+26, padT+9+pi*18);
+  });
+  ctx.fillStyle='#5B6570'; ctx.font='10px IBM Plex Mono'; ctx.textAlign='center';
+  rounds.forEach((r,i)=> ctx.fillText(r.date, padL+i*scaleX, h-10));
+  ctx.textAlign='left'; ctx.fillText('EC (mm)', 8, 16);
+}
+
+function renderPointDiagrams(data){
+  const s = cur();
+  const box = document.getElementById('pointDiagramsBox');
+  box.innerHTML = '';
+  s.points.forEach(pt=>{
+    const wrap = document.createElement('div');
+    const title = document.createElement('div');
+    title.style.cssText = 'text-align:center;font-weight:600;font-size:12.5px;margin-bottom:4px;';
+    title.textContent = pt;
+    const cv = document.createElement('canvas');
+    cv.width = 380; cv.height = 380; cv.id = 'chartPoint_'+pt;
+    wrap.appendChild(title); wrap.appendChild(cv);
+    box.appendChild(wrap);
+    drawPointDiagram(cv, pt, data);
+  });
+}
+function drawPointDiagram(cv, pt, data){
+  const s = cur();
+  const ctx = cv.getContext('2d');
+  const w=cv.width, h=cv.height;
+  ctx.clearRect(0,0,w,h);
+  const series = data.results[pt] || [];
+  const vals = series
+    .map((v,i)=> ({v, isRef: data.sortedRounds[i] && data.sortedRounds[i].isReference}))
+    .filter(x=> x.v && !x.isRef)
+    .map(x=>x.v);
+  const maxV = Math.max(s.rouge*1.35, 1, ...vals.map(v=>Math.max(Math.abs(v.dN),Math.abs(v.dE))));
+  const cx = w/2, cy = h/2;
+  const pad = 34;
+  const scale = (Math.min(w,h)/2 - pad) / maxV;
+
+  // axes
+  ctx.strokeStyle='#DAD6CC'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad,cy); ctx.lineTo(w-pad,cy); ctx.moveTo(cx,pad); ctx.lineTo(cx,h-pad); ctx.stroke();
+  ctx.fillStyle='#5B6570'; ctx.font='10px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('ΔE (mm)', w-pad-20, cy-8);
+  ctx.save(); ctx.translate(cx+14, pad+8); ctx.fillText('ΔN (mm)',0,0); ctx.restore();
+
+  // tolerance circles
+  [ {r:s.jaune, col:'#C98A2B'}, {r:s.rouge, col:'#B23A2E'} ].forEach(c=>{
+    ctx.strokeStyle = c.col; ctx.setLineDash([4,3]); ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, c.r*scale, 0, Math.PI*2); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = c.col; ctx.font='9.5px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillText(c.r.toFixed(1)+'mm', cx + c.r*scale*0.68, cy - c.r*scale*0.72);
+  });
+
+  // PM axis direction (through the étalon centre)
+  if(data.unit){
+    const ux = data.unit.e, uy = data.unit.n; // x=ΔE, y=ΔN(up)
+    const L = Math.min(w,h)/2 - 6;
+    ctx.strokeStyle='#2E7D46'; ctx.setLineDash([6,4]); ctx.lineWidth=1.3;
+    ctx.beginPath();
+    ctx.moveTo(cx-ux*L, cy+uy*L);
+    ctx.lineTo(cx+ux*L, cy-uy*L);
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle='#2E7D46'; ctx.font='10px IBM Plex Sans'; ctx.textAlign='left';
+    ctx.fillText('PM', cx-ux*L+4, cy+uy*L-4);
+  }
+
+  // reference marker
+  ctx.strokeStyle='#22262B'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(cx-5,cy-5); ctx.lineTo(cx+5,cy+5); ctx.moveTo(cx+5,cy-5); ctx.lineTo(cx-5,cy+5); ctx.stroke();
+  ctx.fillStyle='#5B6570'; ctx.font='9.5px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('Réf', cx, cy-9);
+
+  // round points, chronological, light->dark blue
+  const shades = ['#B9D4E8','#8FB9DA','#6699C7','#4477AE','#2C5A8F','#1C2B39','#132030'];
+  vals.forEach((v,i)=>{
+    const px = cx + v.dE*scale, py = cy - v.dN*scale;
+    const col = shades[Math.min(i, shades.length-1)];
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(px,py,4.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#22262B'; ctx.font='9px IBM Plex Mono'; ctx.textAlign='left';
+    ctx.fillText('R'+(i+1), px+6, py+3);
+  });
+}
+
+/* ---------------- SESSION IMPORT / EXPORT ---------------- */
+function exportSession(){
+  readConfig();
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `session_monitoring_${(cur().name||'projet').replace(/\W+/g,'_')}.json`;
+  a.click();
+  dirty = false;
+}
+function importSession(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      state = Object.assign(state, data);
+      if(!state.activeStructureId && state.structures && state.structures.length) state.activeStructureId = state.structures[0].id;
+      renderAllForActiveTab();
+      alert('Session importée.');
+    }catch(err){ alert('Fichier invalide : '+err.message); }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------------- PDF GENERATION (active structure) ---------------- */
+function generatePDF(){
+  const s = cur();
+  let data = computeAll();
+  if(!data){ document.getElementById('pdfStatus').textContent='Aucune donnée — importez des rondes et désignez un étalon.'; return; }
+  readConfig();
+  let cutoffDate = null;
+  if(s.viewRoundId){
+    const idx0 = currentRoundIndex(data.sortedRounds);
+    if(data.sortedRounds[idx0]){
+      cutoffDate = data.sortedRounds[idx0].date;
+      data = truncateData(data, cutoffDate);
+    }
+  }
+  drawBarChart(data, currentRoundIndex(data.sortedRounds));
+  drawLineChart(data);
+  renderPointDiagrams(data);
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'letter'});
+  const marginL = 14; let y = 16;
+
+  try{ doc.addImage(LOGO_B64, 'PNG', 165, 10, 20, 15); }catch(e){}
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.text('Rapport de monitoring de structure', marginL, y); y+=6;
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90);
+  doc.text(`${s.name||''}`, marginL, y); y+=5;
+  doc.text(`Client : ${state.config.client||''}  |  Projet : ${state.config.projet||''}  |  ${state.config.sys||''}`, marginL, y); y+=7;
+  if(cutoffDate){
+    doc.setFont('helvetica','bold'); doc.setTextColor(180,120,30);
+    doc.text(`Rapport rétroactif — reconstruit à partir des données disponibles en date du ${cutoffDate} (rondes ultérieures exclues).`, marginL, y); y+=5;
+    doc.setTextColor(20); doc.setFont('helvetica','normal');
+  }
+  doc.setTextColor(20);
+
+  const curIdx = currentRoundIndex(data.sortedRounds), prevIdx = previousNonRefIndex(data.sortedRounds, curIdx);
+  let worst='vert';
+  s.points.forEach(pt=>{ const c=data.results[pt][curIdx]; if(c){ const f=flagFor(c.ec); if(f==='rouge')worst='rouge'; else if(f==='jaune'&&worst!=='rouge')worst='jaune'; }});
+  const bannerTxt = worst==='vert' ? 'TRAVAUX AUTORISÉS — Tous les EC sont dans les tolérances.'
+    : worst==='jaune' ? 'À VÉRIFIER — Au moins un EC approche le seuil de tolérance.'
+    : 'ARRÊT DES TRAVAUX — Au moins un EC dépasse le seuil rouge.';
+  const bannerColor = worst==='vert'? [231,243,234] : worst==='jaune'? [251,240,221] : [250,231,228];
+  doc.setFillColor(...bannerColor);
+  doc.rect(marginL, y, 182, 8, 'F');
+  doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text(bannerTxt, marginL+3, y+5.5);
+  y+=12;
+
+  const anomalies = s.rounds.flatMap(r=> (r.pendingRaw||[]).map(p=>`Ronde ${r.date} — code « ${p.code} » : ${p.reason} (en attente de validation)`));
+  if(anomalies.length){
+    doc.setFillColor(251,240,221);
+    const boxH = 6 + anomalies.length*4.2;
+    doc.rect(marginL, y, 182, boxH, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('À valider :', marginL+3, y+5);
+    doc.setFont('helvetica','normal');
+    anomalies.forEach((a,i)=> doc.text(a, marginL+3, y+9.5+i*4.2, {maxWidth:176}));
+    y += boxH+5;
+  }
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(20);
+  doc.text(`Axe PM utilisé pour les calculs : ${s.axeA} → ${s.axeB}`, marginL, y); y+=6;
+  doc.setFont('helvetica','normal');
+
+  const body = s.points.map(pt=>{
+    const c = data.results[pt][curIdx];
+    const prev = prevIdx>=0 ? data.results[pt][prevIdx] : null;
+    if(!c) return [pt,'—','—','—','—','—','—','—'];
+    const flag = flagFor(c.ec);
+    const trend = trendFor(c.ec, prev?prev.ec:null, s.trendEps);
+    const trendSym = trend==='up'?'Hausse':trend==='down'?'Baisse':'Stable';
+    return [pt, c.ec.toFixed(2), c.pm.toFixed(2), prev?prev.ec.toFixed(2):'—', prev?prev.pm.toFixed(2):'—', trendSym, fmtCoord(c.z), flag.toUpperCase()];
+  });
+  doc.autoTable({
+    startY:y,
+    head:[['Point','EC init (mm)','PM init (mm)','EC préc (mm)','PM préc (mm)','Tendance','Z actuel (m)','Statut']],
+    body,
+    styles:{fontSize:8, font:'helvetica'},
+    headStyles:{fillColor:[28,43,57]},
+    margin:{left:marginL,right:14},
+    didParseCell: function(d){
+      if(d.section==='body' && d.column.index===7){
+        const v=d.cell.raw;
+        if(v==='VERT') d.cell.styles.fillColor=[231,243,234];
+        if(v==='JAUNE') d.cell.styles.fillColor=[251,240,221];
+        if(v==='ROUGE') d.cell.styles.fillColor=[250,231,228];
+      }
+    }
+  });
+  y = doc.lastAutoTable.finalY + 4;
+  doc.setFontSize(7.5); doc.setTextColor(90);
+  doc.text("EC init / PM init : vs étalon de référence. EC préc / PM préc : valeur du même point à la ronde précédente (vs étalon) — indicateur de tendance, non cumulatif. La valeur EC init demeure la référence à considérer en premier.", marginL, y, {maxWidth:182});
+  y+=8; doc.setTextColor(20);
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Tableau Z — Déplacements verticaux vs étalon (mm)', marginL, y); y+=3;
+  const zHead = ['Point', ...data.sortedRounds.map(r=> r.isReference ? 'Z étalon (m)' : r.date)];
+  const zBody = s.points.map(pt=> [pt, ...data.sortedRounds.map((r,i)=>{
+    if(r.isReference) return data.ref.points[pt] ? fmtCoord(data.ref.points[pt].z) : '—';
+    const v = data.results[pt][i];
+    return v ? v.dZ.toFixed(2) : '—';
+  })]);
+  doc.autoTable({ startY:y+2, head:[zHead], body:zBody, styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  y = doc.lastAutoTable.finalY+8;
+
+  const barCv = document.getElementById('chartBar');
+  const lineCv = document.getElementById('chartLine');
+  if(y>230){ doc.addPage(); y=16; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Écart EC par point — ronde courante', marginL, y); y+=3;
+  doc.addImage(barCv.toDataURL('image/png'), 'PNG', marginL, y, 182, 65); y+=72;
+  if(y>200){ doc.addPage(); y=16; }
+  doc.text('Évolution temporelle EC', marginL, y); y+=3;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+  doc.text("Écart EC de chaque point à travers les rondes, par rapport à l'étalon — utile pour repérer une dérive progressive. Lignes pointillées = seuils de tolérance.", marginL, y+3.5);
+  doc.setTextColor(20); y+=8;
+  doc.addImage(lineCv.toDataURL('image/png'), 'PNG', marginL, y, 182, 65); y+=75;
+
+  doc.addPage(); y=16;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Diagrammes de déplacement PM / EC par point', marginL, y); y+=3;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+  doc.text(`Centre = étalon de référence. Ligne verte = axe PM (${s.axeA} -> ${s.axeB}). EC = déplacement latéral (perpendiculaire). Cercles = seuils de tolérance.`, marginL, y+3.5);
+  doc.setTextColor(20);
+  y+=8;
+  const imgW=86, imgH=86, gap=6;
+  s.points.forEach((pt,i)=>{
+    const col = i%2;
+    if(col===0 && i>0) y += imgH+8;
+    if(y+imgH>270){ doc.addPage(); y=16; }
+    const x = marginL + col*(imgW+gap);
+    const cv2 = document.getElementById('chartPoint_'+pt);
+    if(cv2){
+      doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.text(pt, x+imgW/2, y, {align:'center'});
+      doc.addImage(cv2.toDataURL('image/png'), 'PNG', x, y+2, imgW, imgH);
+    }
+  });
+  y += imgH+10;
+
+  doc.addPage(); y=16;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Historique des rondes de mesures', marginL, y); y+=3;
+  const histBody = data.sortedRounds.map(r=>{
+    const inst = state.instruments.find(i=>i.id===r.instrumentId);
+    return [r.date, r.operateur||'—', inst? `${inst.fab} ${inst.mod} (série ${inst.ser})` : '—', Object.keys(r.points).join(', '), r.note||''];
+  });
+  doc.autoTable({ startY:y+2, head:[['Date','Opérateur','Instrument','Points mesurés','Note']], body:histBody, styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+
+  const refStab = computeRefStability(cutoffDate);
+  if(refStab && s.refPoints.length){
+    doc.addPage(); y=16;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Stabilité des points de référence (réseau stable)', marginL, y); y+=3;
+    const curR = currentRoundIndex(refStab.sortedRounds);
+    const refBody = s.refPoints.map(pt=>{
+      const ser = refStab.out[pt];
+      if(!ser || !ser[curR]) return [pt,'—','—','—','—'];
+      const c = ser[curR];
+      return [pt, c.mag.toFixed(2), c.dN.toFixed(2), c.dE.toFixed(2), c.dZ.toFixed(2)];
+    });
+    doc.autoTable({ startY:y+2, head:[['Point','Déplacement (mm)','dN (mm)','dE (mm)','dZ (mm)']], body:refBody, styles:{fontSize:8}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  }
+
+  if(s.pairs && s.pairs.length){
+    doc.addPage(); y=16;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11);
+    doc.text('Pendage des paires de points (angle zénithal)', marginL, y); y+=3;
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+    doc.text("Angle mesuré depuis la verticale entre chaque point du bas et son point du haut associé (0° = parfaitement à l'aplomb, 90° = horizontal). Le déversement horizontal indiqué est celui entre les deux points/prismes eux-mêmes, non celui de la face du mur (les points ne sont pas nécessairement à égale distance de celle-ci) — l'évolution de cet écart d'une ronde à l'autre demeure toutefois représentative d'un éventuel mouvement du mur. « Écart converti » traduit l'écart angulaire en déplacement linéaire équivalent (mm) à la distance en pente mesurée (distance x tan(écart)).", marginL, y+3.5, {maxWidth:182});
+    doc.setTextColor(20); y+=21;
+    const curRoundPdf = data.sortedRounds[curIdx];
+    const pendageBody = s.pairs.map(pair=>{
+      const basEt = data.ref.points[pair.bas], hautEt = data.ref.points[pair.haut];
+      const basCur = curRoundPdf ? curRoundPdf.points[pair.bas] : null;
+      const hautCur = curRoundPdf ? curRoundPdf.points[pair.haut] : null;
+      const etCalc = computePendage(basEt, hautEt);
+      const curCalc = computePendage(basCur, hautCur);
+      if(!etCalc || !curCalc) return [`${pair.bas} / ${pair.haut}`, '—','—','—','—','—','—'];
+      const deltaDeg = curCalc.zenithDeg - etCalc.zenithDeg;
+      const convertedMM = curCalc.pente * Math.tan(deltaDeg*Math.PI/180) * 1000;
+      return [`${pair.bas} (bas) / ${pair.haut} (haut)`, curCalc.pente.toFixed(3)+' m', toDMS(curCalc.zenithDeg), toDMS(etCalc.zenithDeg), (deltaDeg>=0?'+':'')+toDMS(deltaDeg), (convertedMM>=0?'+':'')+convertedMM.toFixed(1)+' mm', (curCalc.horiz*1000).toFixed(1)+' mm'];
+    });
+    doc.autoTable({ startY:y+2, head:[['Paire (bas / haut)','Dist. en pente','Angle zénithal — courant','Angle zénithal — étalon','Écart','Écart converti','Déversement horiz.']], body:pendageBody, styles:{fontSize:7}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  }
+
+  doc.setFontSize(7.5); doc.setTextColor(120);
+  const pages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.text(`Rapport généré le ${new Date().toLocaleString('fr-CA')} — ${state.config.client||''} — ${state.config.projet||''} — Confidentiel`, marginL, 285);
+    doc.text(`Page ${i}/${pages}`, 195, 285, {align:'right'});
+  }
+
+  doc.save(`rapport_monitoring_${(s.name||'projet').replace(/\W+/g,'_')}.pdf`);
+  document.getElementById('pdfStatus').textContent = 'PDF généré.';
+}
+
+/* ---------------- EXPORT: VERSION CONSULTATION (GITHUB) ----------------
+   Decodes the embedded copy of this very file (SOURCE_TEMPLATE_B64, defined
+   further down), stamps it with the current state as a read-only snapshot,
+   and offers it for download as index.html — ready to drop into a GitHub
+   Pages repo. The downloaded file is a fully standalone copy: opening it
+   does NOT require this app or any server. */
+function exportConsultationVersion(){
+  const statusEl = document.getElementById('exportConsultStatus');
+  try{
+    if(typeof SOURCE_TEMPLATE_B64 === 'undefined' || !SOURCE_TEMPLATE_B64){
+      throw new Error("Gabarit source introuvable dans ce fichier.");
+    }
+    const binary = atob(SOURCE_TEMPLATE_B64);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+    let html = new TextDecoder('utf-8').decode(bytes);
+
+    const stamp = new Date().toLocaleString('fr-CA', {dateStyle:'long', timeStyle:'short'});
+    const stateJson = JSON.stringify(state);
+
+    html = html.replace('"__STATE_JSON_PLACEHOLDER__"', JSON.stringify(stateJson));
+    html = html.replace('"__VIEW_ONLY_PLACEHOLDER__"', JSON.stringify("true"));
+    html = html.replace('"__EXPORT_TIMESTAMP_PLACEHOLDER__"', JSON.stringify(stamp));
+
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index.html';
+    a.click();
+    if(statusEl) statusEl.innerHTML = '✅ <b>index.html</b> généré (' + stamp + '). Déposez-le sur GitHub — il remplace la version déjà en ligne.';
+  }catch(e){
+    if(statusEl) statusEl.textContent = 'Erreur lors de la génération : ' + e.message;
+    console.error(e);
+  }
+}
+
+/* ---------------- PERSISTENCE (localStorage autosave) ---------------- */
+const STORAGE_KEY = 'monitoring_structure_session_v2';
+function autosave(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadAutosave(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    state = Object.assign(state, data);
+    if(!state.activeStructureId && state.structures && state.structures.length) state.activeStructureId = state.structures[0].id;
+    return true;
+  }catch(e){ return false; }
+}
+window.addEventListener('beforeunload', (e)=>{
+  if(dirty && !VIEW_ONLY){
+    e.preventDefault();
+    e.returnValue = "Des données n'ont pas été exportées (JSON). Confirmez que la sauvegarde a été faite avant de quitter.";
+    return e.returnValue;
+  }
+});
+
+/* ---------------- INIT ---------------- */
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('logoImg').src = LOGO_B64;
+  if(!VIEW_ONLY) loadAutosave();
+  document.getElementById('cfgClient').value = state.config.client||'HUDL';
+  document.getElementById('cfgProjet').value = state.config.projet||'AN-26-008';
+  document.getElementById('cfgResp').value = state.config.resp||'';
+  document.getElementById('cfgSys').value = state.config.sys||'';
+  document.getElementById('cfgFC').value = state.config.fc||1;
+  document.getElementById('cfgDecimals').value = state.config.decimals===undefined?3:state.config.decimals;
+  renderAllForActiveTab();
+  document.getElementById('importDate').valueAsDate = new Date();
+  document.getElementById('etalonImportDate').valueAsDate = new Date();
+  dirty = false;
+  applyViewOnlyMode();
+  if(VIEW_ONLY) renderResults();
+});
+</script>
+</body>
+</html>
