@@ -422,19 +422,32 @@ canvas{max-width:100%;background:#fff;}
   </div>
   <div class="card">
     <h2>Tableau comparatif PM / EC</h2>
-    <p class="hint">EC = écart perpendiculaire à l'axe (colonne critique). PM = déplacement longitudinal. « vs préc. » = valeur de ce point à la ronde précédente (vs étalon), pour comparaison — non cumulative : la valeur EC init demeure la référence à considérer en premier.</p>
+    <p class="hint">EC = écart perpendiculaire à l'axe (colonne critique), calculé vs l'étalon de référence. PM = déplacement longitudinal, également vs l'étalon. ΔZ init = déplacement vertical vs l'étalon (mm). Les coordonnées brutes (N/E/Z) sont détaillées dans le tableau ci-dessous.</p>
     <p class="small" id="axeUsedBox" style="margin-bottom:10px;"></p>
     <div id="bannerBox"></div>
     <div id="resultsTableBox"></div>
   </div>
   <div class="card">
-    <h2>Stabilité des points de référence</h2>
-    <p class="hint">Points ancrés sur une structure stable. Un déplacement ici remet en question la fiabilité de la ronde plutôt que d'indiquer un mouvement réel de la structure surveillée.</p>
-    <div id="refTableBox"></div>
+    <h2>Coordonnées brutes (N / E / Z) — étalon vs ronde courante</h2>
+    <p class="hint">Coordonnées non transformées, telles que mesurées, pour donner un repère physique concret aux valeurs EC/PM du tableau ci-dessus (qui sont calculées après projection sur l'axe PM). Par exemple, un déplacement de 1 mm en Nord et 1 mm en Est ne correspond pas nécessairement à 1 mm de PM ou d'EC — la valeur projetée dépend de l'orientation de l'axe choisi. Les écarts (mm) de chaque ronde par rapport à l'étalon sont détaillés dans les tableaux N, E et Z ci-dessous.</p>
+    <div id="coordsTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Tableau N — Déplacements Nord vs étalon (mm)</h2>
+    <div id="nTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Tableau E — Déplacements Est vs étalon (mm)</h2>
+    <div id="eTableBox"></div>
   </div>
   <div class="card">
     <h2>Tableau Z — Déplacements verticaux vs étalon (mm)</h2>
     <div id="zTableBox"></div>
+  </div>
+  <div class="card">
+    <h2>Stabilité des points de référence</h2>
+    <p class="hint">Points ancrés sur une structure stable. Un déplacement ici remet en question la fiabilité de la ronde plutôt que d'indiquer un mouvement réel de la structure surveillée.</p>
+    <div id="refTableBox"></div>
   </div>
   <div class="card">
     <h2>Écart EC par point — ronde courante</h2>
@@ -500,8 +513,8 @@ function newStructure(name){
    full desktop copy of this file. In the file you are looking at right now,
    they remain untouched, so the app behaves as the normal, fully editable
    desktop version. */
-const __EXPORTED_STATE_RAW__ = "{\"config\":{\"client\":\"HUDL\",\"projet\":\"AN-26-008- PONT 20621 RIVIÈRE CHASSÉ\",\"resp\":\"Arpent-Nord Construction\",\"sys\":\"SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28\",\"fc\":1,\"decimals\":3},\"instruments\":[{\"id\":\"i1783357921713\",\"fab\":\"Leica\",\"mod\":\"MS60 1\\\" R2000\",\"ser\":\"885396\",\"cal\":\"885396-251229-1059/29. Décembre 2025\"}],\"structures\":[{\"id\":\"s1783350091097882\",\"name\":\"MUR DE REMBLAIS EXISTANT\",\"axeA\":\"101\",\"axeB\":\"102\",\"jaune\":2,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"101\",\"102\",\"103\",\"111\",\"112\",\"113\"],\"refPoints\":[\"53\",\"51\",\"52\"],\"rounds\":[{\"id\":\"r1783362493363\",\"date\":\"2026-06-13\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.157,\"z\":163.967},\"102\":{\"n\":5146856.875,\"e\":264465.988,\"z\":163.975},\"103\":{\"n\":5146848.277,\"e\":264462.262,\"z\":163.775},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.976},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.015},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783367540498\",\"date\":\"2026-06-20\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368120659\",\"date\":\"2026-06-25\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.32,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.186,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368395307\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783607303846\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"Levé étalon de référence (MOYENNE 4 RONDES)\",\"isReference\":true,\"points\":{\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"52\":{\"n\":5146922.496,\"e\":264466.484,\"z\":161.386},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[],\"sourceText\":\"51,5146819.350,264447.582,162.698\\n52,5146922.496,264466.484,161.386\\n53,5146885.865,264482.875,164.542\\n101,5146869.087,264473.157,163.966\\n102,5146856.874,264465.987,163.975\\n103,5146848.276,264462.261,163.774\\n113,5146848.239,264462.397,165.801\\n112,5146856.802,264466.186,166.014\\n111,5146869.013,264473.319,165.975\\n\\n\\n\",\"sourceFileName\":\"AN-26-005 MONITORING 2026-07-06.txt\"},{\"id\":\"r1783369145955\",\"date\":\"2026-07-01\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.277,\"e\":264462.26,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783369267499\",\"date\":\"2026-07-04\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.012},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783513280383\",\"date\":\"2026-07-08\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866, 264482.874,164.542,_*             \\nMON101,5146869.086, 264473.156,163.966,_*             \\nMON111,5146869.012, 264473.319,165.975,_*             \\nMON102,5146856.874, 264465.985,163.974,_*             \\nMON112,5146856.800, 264466.184,166.013,_*             \\nMON103,5146848.276, 264462.259,163.773,_*             \\nMON113,5146848.238, 264462.395,165.800,_*                               \",\"sourceFileName\":\"260708A0055MON70_MON.txt\"},{\"id\":\"r1783690460928\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"\",\"isReference\":false,\"points\":{\"51\":{\"n\":5146819.349,\"e\":264447.582,\"z\":162.698},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON101,5146869.086,264473.157,163.966           \\nMON111,5146869.012,264473.319,165.975           \\nMON102,5146856.873,264465.985,163.974           \\nMON112,5146856.800,264466.184,166.013           \\nMON103,5146848.276,264462.260,163.773           \\nMON113,5146848.238,264462.396,165.800           \\nMON51,5146819.349,264447.582,162.698            \",\"sourceFileName\":\"260709A0051MON63_MON.txt\"},{\"id\":\"r1783690605464\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.543},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.799}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.865,264482.875,164.543        \\nMON101,5146869.086,264473.157,163.966        \\nMON111,5146869.012,264473.319,165.975        \\nMON102,5146856.873,264465.985,163.974        \\nMON112,5146856.800,264466.184,166.013        \\nMON103,5146848.276,264462.259,163.773        \\nMON113,5146848.238,264462.395,165.799        \",\"sourceFileName\":\"260710A0051MON63_MON.txt\"},{\"id\":\"r1783941666154\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866,264482.874,164.542             \\nMON101,5146869.086,264473.157,163.966         \\nMON111,5146869.012,264473.319,165.975         \\nMON102,5146856.873,264465.985,163.974         \\nMON112,5146856.800,264466.184,166.013         \\nMON103,5146848.276,264462.259,163.774         \\nMON113,5146848.238,264462.395,165.800         \",\"sourceFileName\":\"260713A0051MON63_MON.txt\"}],\"pointMapping\":{},\"etalonLocked\":true,\"viewRoundId\":null,\"pairs\":[{\"id\":\"pr178344615167329\",\"bas\":\"101\",\"haut\":\"111\"},{\"id\":\"pr1783446158121250\",\"bas\":\"102\",\"haut\":\"112\"},{\"id\":\"pr1783446164273167\",\"bas\":\"103\",\"haut\":\"113\"}]},{\"id\":\"s1783350102160448\",\"name\":\"MUR BERLINOIS\",\"axeA\":\"28\",\"axeB\":\"29\",\"jaune\":2,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"28\",\"29\",\"30\",\"31\"],\"refPoints\":[\"53\",\"51\"],\"rounds\":[{\"id\":\"r1783606232046\",\"date\":\"2026-07-08\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"Levé étalon de référence\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.59,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.191,\"z\":162.403},\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"51,5146819.350,264447.582,162.698\\n53,5146885.865,264482.875,164.542\\n28,5146864.120, 264466.590,162.552      \\n29,5146859.889, 264464.147,162.644      \\n30,5146855.678, 264461.648,162.555      \\n31,5146851.450, 264459.191,162.403                \\n            \\n\",\"sourceFileName\":\"260708A0055MON70_MONBERLINOIS.txt\"},{\"id\":\"r1783606367087\",\"date\":\"2026-07-09\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"pour le point 31, nous allons valider la valeur étalon (1 seule ronde ), avec la 3e/4e ronde, excavation minimum à ce jour\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.649,\"z\":162.555},\"31\":{\"n\":5146851.449,\"e\":264459.193,\"z\":162.403},\"51\":{\"n\":5146819.349,\"e\":264447.582,\"z\":162.698}},\"pendingRaw\":[],\"sourceText\":\"MON29,5146859.889,264464.147,162.644            \\nMON30,5146855.678,264461.649,162.555            \\nMON31,5146851.449,264459.193,162.403            \\nMON28,5146864.120,264466.591,162.552            \\nMON51,5146819.349,264447.582,162.698            \",\"sourceFileName\":\"260709A0051MON63_MON.txt\"},{\"id\":\"r1783690736663\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.148,\"z\":162.643},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.449,\"e\":264459.189,\"z\":162.403},\"51\":{\"n\":5146819.349,\"e\":264447.581,\"z\":162.698}},\"pendingRaw\":[],\"sourceText\":\"51MON,5146819.349,264447.581,162.698        \\n28MON,5146864.120,264466.591,162.552        \\n29MON,5146859.889,264464.148,162.643        \\n30MON,5146855.678,264461.648,162.555        \\n31MON,5146851.449,264459.189,162.403        \\n\",\"sourceFileName\":\"260710A0051MON63_BERLINOIS.txt\"},{\"id\":\"r1783943888259\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"Levé étalon de référence\",\"isReference\":true,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.192,\"z\":162.403},\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"28,5146864.120,264466.591,162.552        \\n29,5146859.889,264464.147,162.644        \\n30,5146855.678,264461.648,162.555        \\n31,5146851.450,264459.192,162.403        \\n51,5146819.350,264447.582,162.698\\n53,5146885.865,264482.875,164.542\",\"sourceFileName\":\"ETALON MOYEN_BERLINOIS.txt\"},{\"id\":\"r1783944315265\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.59,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.194,\"z\":162.402},\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866,264482.874,164.542             \\nMON28,5146864.120,264466.590,162.552       \\nMON29,5146859.889,264464.147,162.644       \\nMON30,5146855.678,264461.648,162.555       \\nMON31,5146851.450,264459.194,162.402       \",\"sourceFileName\":\"260713A0051MON63_MON.txt\"}],\"pointMapping\":{},\"pairs\":[],\"etalonLocked\":true,\"viewRoundId\":null}],\"activeStructureId\":\"s1783350091097882\"}";
-const __EXPORT_TIMESTAMP__ = "13 juillet 2026 à 08 h 05";
+const __EXPORTED_STATE_RAW__ = "{\"config\":{\"client\":\"HUDL\",\"projet\":\"AN-26-005- PONT 20621 RIVIÈRE CHASSÉ\",\"resp\":\"Arpent-Nord Construction\",\"sys\":\"SCOPQ – MTM Zone 7 / NAD83-SCRS / CGVD28\",\"fc\":1,\"decimals\":3},\"instruments\":[{\"id\":\"i1783357921713\",\"fab\":\"Leica\",\"mod\":\"MS60 1\\\" R2000\",\"ser\":\"885396\",\"cal\":\"885396-251229-1059/29. Décembre 2025\"}],\"structures\":[{\"id\":\"s1783350091097882\",\"name\":\"MUR DE REMBLAIS EXISTANT\",\"axeA\":\"101\",\"axeB\":\"102\",\"jaune\":2,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"101\",\"102\",\"103\",\"111\",\"112\",\"113\"],\"refPoints\":[\"53\",\"51\",\"52\"],\"rounds\":[{\"id\":\"r1783362493363\",\"date\":\"2026-06-13\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.157,\"z\":163.967},\"102\":{\"n\":5146856.875,\"e\":264465.988,\"z\":163.975},\"103\":{\"n\":5146848.277,\"e\":264462.262,\"z\":163.775},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.976},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.015},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783367540498\",\"date\":\"2026-06-20\",\"instrumentId\":\"i2\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368120659\",\"date\":\"2026-06-25\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.32,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.186,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783368395307\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.185,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.801}},\"pendingRaw\":[]},{\"id\":\"r1783607303846\",\"date\":\"2026-06-27\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"Levé étalon de référence (MOYENNE 4 RONDES)\",\"isReference\":true,\"points\":{\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"52\":{\"n\":5146922.496,\"e\":264466.484,\"z\":161.386},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.087,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.987,\"z\":163.975},\"103\":{\"n\":5146848.276,\"e\":264462.261,\"z\":163.774},\"111\":{\"n\":5146869.013,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.802,\"e\":264466.186,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.397,\"z\":165.801}},\"pendingRaw\":[],\"sourceText\":\"51,5146819.350,264447.582,162.698\\n52,5146922.496,264466.484,161.386\\n53,5146885.865,264482.875,164.542\\n101,5146869.087,264473.157,163.966\\n102,5146856.874,264465.987,163.975\\n103,5146848.276,264462.261,163.774\\n113,5146848.239,264462.397,165.801\\n112,5146856.802,264466.186,166.014\\n111,5146869.013,264473.319,165.975\\n\\n\\n\",\"sourceFileName\":\"AN-26-005 MONITORING 2026-07-06.txt\"},{\"id\":\"r1783369145955\",\"date\":\"2026-07-01\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.088,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.277,\"e\":264462.26,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.014},\"113\":{\"n\":5146848.239,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783369267499\",\"date\":\"2026-07-04\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.986,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.801,\"e\":264466.184,\"z\":166.012},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[]},{\"id\":\"r1783513280383\",\"date\":\"2026-07-08\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.156,\"z\":163.966},\"102\":{\"n\":5146856.874,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866, 264482.874,164.542,_*             \\nMON101,5146869.086, 264473.156,163.966,_*             \\nMON111,5146869.012, 264473.319,165.975,_*             \\nMON102,5146856.874, 264465.985,163.974,_*             \\nMON112,5146856.800, 264466.184,166.013,_*             \\nMON103,5146848.276, 264462.259,163.773,_*             \\nMON113,5146848.238, 264462.395,165.800,_*                               \",\"sourceFileName\":\"260708A0055MON70_MON.txt\"},{\"id\":\"r1783690460928\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"Arpent-Nord Construction\",\"note\":\"\",\"isReference\":false,\"points\":{\"51\":{\"n\":5146819.349,\"e\":264447.582,\"z\":162.698},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.26,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.396,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON101,5146869.086,264473.157,163.966           \\nMON111,5146869.012,264473.319,165.975           \\nMON102,5146856.873,264465.985,163.974           \\nMON112,5146856.800,264466.184,166.013           \\nMON103,5146848.276,264462.260,163.773           \\nMON113,5146848.238,264462.396,165.800           \\nMON51,5146819.349,264447.582,162.698            \",\"sourceFileName\":\"260709A0051MON63_MON.txt\"},{\"id\":\"r1783690605464\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.543},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.773},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.799}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.865,264482.875,164.543        \\nMON101,5146869.086,264473.157,163.966        \\nMON111,5146869.012,264473.319,165.975        \\nMON102,5146856.873,264465.985,163.974        \\nMON112,5146856.800,264466.184,166.013        \\nMON103,5146848.276,264462.259,163.773        \\nMON113,5146848.238,264462.395,165.799        \",\"sourceFileName\":\"260710A0051MON63_MON.txt\"},{\"id\":\"r1783941666154\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542},\"101\":{\"n\":5146869.086,\"e\":264473.157,\"z\":163.966},\"102\":{\"n\":5146856.873,\"e\":264465.985,\"z\":163.974},\"103\":{\"n\":5146848.276,\"e\":264462.259,\"z\":163.774},\"111\":{\"n\":5146869.012,\"e\":264473.319,\"z\":165.975},\"112\":{\"n\":5146856.8,\"e\":264466.184,\"z\":166.013},\"113\":{\"n\":5146848.238,\"e\":264462.395,\"z\":165.8}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866,264482.874,164.542             \\nMON101,5146869.086,264473.157,163.966         \\nMON111,5146869.012,264473.319,165.975         \\nMON102,5146856.873,264465.985,163.974         \\nMON112,5146856.800,264466.184,166.013         \\nMON103,5146848.276,264462.259,163.774         \\nMON113,5146848.238,264462.395,165.800         \",\"sourceFileName\":\"260713A0051MON63_MON.txt\"}],\"pointMapping\":{},\"etalonLocked\":true,\"viewRoundId\":null,\"pairs\":[{\"id\":\"pr178344615167329\",\"bas\":\"101\",\"haut\":\"111\"},{\"id\":\"pr1783446158121250\",\"bas\":\"102\",\"haut\":\"112\"},{\"id\":\"pr1783446164273167\",\"bas\":\"103\",\"haut\":\"113\"}]},{\"id\":\"s1783350102160448\",\"name\":\"MUR BERLINOIS\",\"axeA\":\"28\",\"axeB\":\"29\",\"jaune\":2,\"rouge\":5,\"trendEps\":0.15,\"points\":[\"28\",\"29\",\"30\",\"31\"],\"refPoints\":[\"53\",\"51\"],\"rounds\":[{\"id\":\"r1783606232046\",\"date\":\"2026-07-08\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"BERNARD DUVAL\",\"note\":\"Levé étalon de référence\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.59,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.191,\"z\":162.403},\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"51,5146819.350,264447.582,162.698\\n53,5146885.865,264482.875,164.542\\n28,5146864.120, 264466.590,162.552      \\n29,5146859.889, 264464.147,162.644      \\n30,5146855.678, 264461.648,162.555      \\n31,5146851.450, 264459.191,162.403                \\n            \\n\",\"sourceFileName\":\"260708A0055MON70_MONBERLINOIS.txt\"},{\"id\":\"r1783606367087\",\"date\":\"2026-07-09\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"pour le point 31, nous allons valider la valeur étalon (1 seule ronde ), avec la 3e/4e ronde, excavation minimum à ce jour\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.649,\"z\":162.555},\"31\":{\"n\":5146851.449,\"e\":264459.193,\"z\":162.403},\"51\":{\"n\":5146819.349,\"e\":264447.582,\"z\":162.698}},\"pendingRaw\":[],\"sourceText\":\"MON29,5146859.889,264464.147,162.644            \\nMON30,5146855.678,264461.649,162.555            \\nMON31,5146851.449,264459.193,162.403            \\nMON28,5146864.120,264466.591,162.552            \\nMON51,5146819.349,264447.582,162.698            \",\"sourceFileName\":\"260709A0051MON63_MON.txt\"},{\"id\":\"r1783690736663\",\"date\":\"2026-07-10\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.148,\"z\":162.643},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.449,\"e\":264459.189,\"z\":162.403},\"51\":{\"n\":5146819.349,\"e\":264447.581,\"z\":162.698}},\"pendingRaw\":[],\"sourceText\":\"51MON,5146819.349,264447.581,162.698        \\n28MON,5146864.120,264466.591,162.552        \\n29MON,5146859.889,264464.148,162.643        \\n30MON,5146855.678,264461.648,162.555        \\n31MON,5146851.449,264459.189,162.403        \\n\",\"sourceFileName\":\"260710A0051MON63_BERLINOIS.txt\"},{\"id\":\"r1783943888259\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"Levé étalon de référence\",\"isReference\":true,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.591,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.192,\"z\":162.403},\"51\":{\"n\":5146819.35,\"e\":264447.582,\"z\":162.698},\"53\":{\"n\":5146885.865,\"e\":264482.875,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"28,5146864.120,264466.591,162.552        \\n29,5146859.889,264464.147,162.644        \\n30,5146855.678,264461.648,162.555        \\n31,5146851.450,264459.192,162.403        \\n51,5146819.350,264447.582,162.698\\n53,5146885.865,264482.875,164.542\",\"sourceFileName\":\"ETALON MOYEN_BERLINOIS.txt\"},{\"id\":\"r1783944315265\",\"date\":\"2026-07-13\",\"instrumentId\":\"i1783357921713\",\"operateur\":\"RENE LANGEVIN\",\"note\":\"\",\"isReference\":false,\"points\":{\"28\":{\"n\":5146864.12,\"e\":264466.59,\"z\":162.552},\"29\":{\"n\":5146859.889,\"e\":264464.147,\"z\":162.644},\"30\":{\"n\":5146855.678,\"e\":264461.648,\"z\":162.555},\"31\":{\"n\":5146851.45,\"e\":264459.194,\"z\":162.402},\"53\":{\"n\":5146885.866,\"e\":264482.874,\"z\":164.542}},\"pendingRaw\":[],\"sourceText\":\"MON53,5146885.866,264482.874,164.542             \\nMON28,5146864.120,264466.590,162.552       \\nMON29,5146859.889,264464.147,162.644       \\nMON30,5146855.678,264461.648,162.555       \\nMON31,5146851.450,264459.194,162.402       \",\"sourceFileName\":\"260713A0051MON63_MON.txt\"}],\"pointMapping\":{},\"pairs\":[],\"etalonLocked\":true,\"viewRoundId\":null}],\"activeStructureId\":\"s1783350091097882\"}";
+const __EXPORT_TIMESTAMP__ = "14 juillet 2026 à 08 h 12";
 let VIEW_ONLY = ("true" === "true");
 let __EXPORTED_STATE__ = null;
 if(__EXPORTED_STATE_RAW__ !== "__STATE_JSON_PLACEHOLDER__"){
@@ -808,6 +821,33 @@ function computePendage(bas, haut){
   const zenithDeg = Math.atan2(horiz, dZ) * 180 / Math.PI; // 0° = parfaitement à l'aplomb (vertical)
   let bearingDeg = Math.atan2(dE, dN) * 180 / Math.PI; if(bearingDeg<0) bearingDeg += 360;
   return {dN, dE, dZ, horiz, pente, zenithDeg, bearingDeg};
+}
+function renderCoordsTable(data, curIdx){
+  const s = cur();
+  const box = document.getElementById('coordsTableBox');
+  if(!box) return;
+  const curRound = data.sortedRounds[curIdx];
+  const rows = s.points.map(pt=>{
+    const et = data.ref.points[pt];
+    const now = curRound ? curRound.points[pt] : null;
+    if(!et || !now){
+      return `<tr><td class="left">${pt}</td><td colspan="6" class="small">Point non mesuré à l'étalon ou à cette ronde</td></tr>`;
+    }
+    return `<tr>
+      <td class="left">${pt}</td>
+      <td>${fmtCoord(et.n)}</td><td>${fmtCoord(et.e)}</td><td>${fmtCoord(et.z)}</td>
+      <td>${fmtCoord(now.n)}</td><td>${fmtCoord(now.e)}</td><td>${fmtCoord(now.z)}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table class="data">
+    <tr>
+      <th class="left" rowspan="2">Point</th>
+      <th colspan="3">Coordonnées étalon (m)</th>
+      <th colspan="3">Coordonnées ronde courante (m)</th>
+    </tr>
+    <tr><th>N</th><th>E</th><th>Z</th><th>N</th><th>E</th><th>Z</th></tr>
+    ${rows}
+  </table>`;
 }
 function renderPendageTable(data, curIdx){
   const s = cur();
@@ -1261,6 +1301,8 @@ function deleteRound(i){
   }
   if(r.isReference && !s.etalonLocked){
     if(!confirm("Cette ronde sert actuellement d'étalon de référence. La supprimer effacera les valeurs étalons de la structure. Continuer ?")) return;
+  } else {
+    if(!confirm(`Supprimer définitivement la ronde du ${r.date}${r.operateur? ' ('+r.operateur+')' : ''} ? Cette action ne peut pas être annulée.`)) return;
   }
   s.rounds.splice(i,1);
   if(s.rounds.length && !s.rounds.some(r=>r.isReference)) s.rounds[0].isReference=true;
@@ -1415,32 +1457,25 @@ function renderResults(){
     data = truncateData(data, cutoffDate);
     curIdx = currentRoundIndex(data.sortedRounds);
   }
-  const prevIdx = previousNonRefIndex(data.sortedRounds, curIdx);
   let worst = 'vert';
 
   let rows = '';
   s.points.forEach(pt=>{
     const series = data.results[pt];
     const c = series[curIdx];
-    if(!c){ rows += `<tr><td class="left">${pt}</td><td colspan="7">Pas de mesure à la ronde courante</td></tr>`; return; }
-    const prev = prevIdx>=0 ? series[prevIdx] : null;
+    if(!c){ rows += `<tr><td class="left">${pt}</td><td colspan="4">Pas de mesure à la ronde courante</td></tr>`; return; }
     const flag = flagFor(c.ec);
     if(flag==='rouge') worst='rouge'; else if(flag==='jaune' && worst!=='rouge') worst='jaune';
-    const trend = trendFor(c.ec, prev? prev.ec : null, s.trendEps);
-    const trendCls = trend==='up'?'trend-up':trend==='down'?'trend-down':'trend-flat';
     rows += `<tr class="flag-${flag}">
       <td class="left">${pt}</td>
       <td class="ec">${c.ec.toFixed(2)}</td>
       <td>${c.pm.toFixed(2)}</td>
-      <td>${prev? prev.ec.toFixed(2): '—'}</td>
-      <td>${prev? prev.pm.toFixed(2): '—'}</td>
-      <td class="${trendCls}"></td>
-      <td>${fmtCoord(c.z)}</td>
+      <td>${c.dZ>=0?'+':''}${c.dZ.toFixed(2)}</td>
       <td><span class="badge ${flag==='vert'?'ok':flag==='jaune'?'warn':'danger'}">${flag.toUpperCase()}</span></td>
     </tr>`;
   });
   box.innerHTML = `<table class="data">
-    <tr><th class="left">Point</th><th>EC init (mm)</th><th>PM init (mm)</th><th>EC préc (mm)</th><th>PM préc (mm)</th><th>Tendance</th><th>Z actuel (m)</th><th>Statut</th></tr>
+    <tr><th class="left">Point</th><th>EC init (mm)</th><th>PM init (mm)</th><th>ΔZ init (mm)</th><th>Statut</th></tr>
     ${rows}
   </table>`;
 
@@ -1451,20 +1486,35 @@ function renderResults(){
   const retroNote = cutoffDate ? `<div class="banner warn">Vue rétroactive — données reconstruites en date du ${cutoffDate} (rondes ultérieures exclues des graphiques et tableaux).</div>` : '';
   bannerBox.innerHTML = `${retroNote}<div class="banner ${bannerCls}">${bannerTxt}</div>`;
 
-  let zRows = '';
+  // Ordre d'affichage : étalon toujours en premier, peu importe sa date, puis les rondes en ordre chronologique.
+  const refPos = data.sortedRounds.findIndex(r=>r.isReference);
+  const order = [];
+  if(refPos>=0) order.push(refPos);
+  data.sortedRounds.forEach((r,i)=>{ if(i!==refPos) order.push(i); });
+  const orderedHeaders = order.map(i=> data.sortedRounds[i].isReference ? 'Étalon' : data.sortedRounds[i].date);
+
+  let nRows='', eRows='', zRows='';
   s.points.forEach(pt=>{
     const series = data.results[pt];
-    zRows += `<tr><td class="left">${pt}</td>` + data.sortedRounds.map((r,i)=>{
+    const rowFor = (field, refField)=> order.map(i=>{
+      const r = data.sortedRounds[i];
       if(r.isReference){
-        const zv = data.ref.points[pt] ? fmtCoord(data.ref.points[pt].z) : '—';
-        return `<td>${zv}</td>`;
+        const rv = data.ref.points[pt] ? fmtCoord(data.ref.points[pt][refField]) : '—';
+        return `<td>${rv}</td>`;
       }
       const v = series[i];
-      return `<td>${v? v.dZ.toFixed(2) : '—'}</td>`;
-    }).join('') + '</tr>';
+      if(!v) return '<td>—</td>';
+      const val = v[field];
+      return `<td>${val>=0?'+':''}${val.toFixed(2)}</td>`;
+    }).join('');
+    nRows += `<tr><td class="left">${pt}</td>${rowFor('dN','n')}</tr>`;
+    eRows += `<tr><td class="left">${pt}</td>${rowFor('dE','e')}</tr>`;
+    zRows += `<tr><td class="left">${pt}</td>${rowFor('dZ','z')}</tr>`;
   });
-  const zHeaders = data.sortedRounds.map(r=> r.isReference ? 'Z étalon (m)' : r.date);
-  zBox.innerHTML = `<table class="data"><tr><th class="left">Point</th>${zHeaders.map(h=>`<th>${h}</th>`).join('')}</tr>${zRows}</table>`;
+  const headHtml = `<th class="left">Point</th>${orderedHeaders.map(h=>`<th>${h}</th>`).join('')}`;
+  document.getElementById('nTableBox').innerHTML = `<table class="data"><tr>${headHtml}</tr>${nRows}</table>`;
+  document.getElementById('eTableBox').innerHTML = `<table class="data"><tr>${headHtml}</tr>${eRows}</table>`;
+  zBox.innerHTML = `<table class="data"><tr>${headHtml}</tr>${zRows}</table>`;
 
   const refBox = document.getElementById('refTableBox');
   const refData = computeRefStability(cutoffDate);
@@ -1489,6 +1539,7 @@ function renderResults(){
   drawLineChart(data);
   renderPointDiagrams(data);
   renderPendageTable(data, curIdx);
+  renderCoordsTable(data, curIdx);
   window.__lastComputed = data;
 }
 
@@ -1751,22 +1802,19 @@ function generatePDF(){
 
   const body = s.points.map(pt=>{
     const c = data.results[pt][curIdx];
-    const prev = prevIdx>=0 ? data.results[pt][prevIdx] : null;
-    if(!c) return [pt,'—','—','—','—','—','—','—'];
+    if(!c) return [pt,'—','—','—','—'];
     const flag = flagFor(c.ec);
-    const trend = trendFor(c.ec, prev?prev.ec:null, s.trendEps);
-    const trendSym = trend==='up'?'Hausse':trend==='down'?'Baisse':'Stable';
-    return [pt, c.ec.toFixed(2), c.pm.toFixed(2), prev?prev.ec.toFixed(2):'—', prev?prev.pm.toFixed(2):'—', trendSym, fmtCoord(c.z), flag.toUpperCase()];
+    return [pt, c.ec.toFixed(2), c.pm.toFixed(2), (c.dZ>=0?'+':'')+c.dZ.toFixed(2), flag.toUpperCase()];
   });
   doc.autoTable({
     startY:y,
-    head:[['Point','EC init (mm)','PM init (mm)','EC préc (mm)','PM préc (mm)','Tendance','Z actuel (m)','Statut']],
+    head:[['Point','EC init (mm)','PM init (mm)','ΔZ init (mm)','Statut']],
     body,
     styles:{fontSize:8, font:'helvetica'},
     headStyles:{fillColor:[28,43,57]},
     margin:{left:marginL,right:14},
     didParseCell: function(d){
-      if(d.section==='body' && d.column.index===7){
+      if(d.section==='body' && d.column.index===4){
         const v=d.cell.raw;
         if(v==='VERT') d.cell.styles.fillColor=[231,243,234];
         if(v==='JAUNE') d.cell.styles.fillColor=[251,240,221];
@@ -1776,19 +1824,82 @@ function generatePDF(){
   });
   y = doc.lastAutoTable.finalY + 4;
   doc.setFontSize(7.5); doc.setTextColor(90);
-  doc.text("EC init / PM init : vs étalon de référence. EC préc / PM préc : valeur du même point à la ronde précédente (vs étalon) — indicateur de tendance, non cumulatif. La valeur EC init demeure la référence à considérer en premier.", marginL, y, {maxWidth:182});
+  doc.text("EC init / PM init : valeurs vs étalon de référence.", marginL, y, {maxWidth:182});
   y+=8; doc.setTextColor(20);
 
   doc.setFont('helvetica','bold'); doc.setFontSize(11);
-  doc.text('Tableau Z — Déplacements verticaux vs étalon (mm)', marginL, y); y+=3;
-  const zHead = ['Point', ...data.sortedRounds.map(r=> r.isReference ? 'Z étalon (m)' : r.date)];
-  const zBody = s.points.map(pt=> [pt, ...data.sortedRounds.map((r,i)=>{
-    if(r.isReference) return data.ref.points[pt] ? fmtCoord(data.ref.points[pt].z) : '—';
-    const v = data.results[pt][i];
-    return v ? v.dZ.toFixed(2) : '—';
-  })]);
-  doc.autoTable({ startY:y+2, head:[zHead], body:zBody, styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  doc.text('Coordonnées brutes (N / E / Z) — étalon vs ronde courante', marginL, y); y+=3;
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(90);
+  doc.text("Coordonnées non transformées, telles que mesurées, pour donner un repère physique concret aux valeurs EC/PM ci-dessus (calculées après projection sur l'axe PM). Les écarts (mm) de chaque ronde par rapport à l'étalon sont détaillés dans les tableaux N, E et Z ci-dessous.", marginL, y+3.5, {maxWidth:182});
+  doc.setTextColor(20); y+=13;
+  const curRoundCoords = data.sortedRounds[curIdx];
+  const coordsBody = s.points.map(pt=>{
+    const et = data.ref.points[pt];
+    const now = curRoundCoords ? curRoundCoords.points[pt] : null;
+    if(!et || !now) return [pt,'—','—','—','—','—','—'];
+    return [pt, fmtCoord(et.n), fmtCoord(et.e), fmtCoord(et.z), fmtCoord(now.n), fmtCoord(now.e), fmtCoord(now.z)];
+  });
+  doc.autoTable({
+    startY:y+2,
+    head:[
+      [{content:'Point',rowSpan:2}, {content:'Coordonnées étalon (m)',colSpan:3}, {content:'Coordonnées ronde courante (m)',colSpan:3}],
+      ['N','E','Z','N','E','Z']
+    ],
+    body:coordsBody, styles:{fontSize:7}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14}
+  });
   y = doc.lastAutoTable.finalY+8;
+
+  // Ordre d'affichage : étalon toujours en premier, peu importe sa date.
+  const refPosPdf = data.sortedRounds.findIndex(r=>r.isReference);
+  const orderPdf = [];
+  if(refPosPdf>=0) orderPdf.push(refPosPdf);
+  data.sortedRounds.forEach((r,i)=>{ if(i!==refPosPdf) orderPdf.push(i); });
+  const orderedHeadPdf = ['Point', ...orderPdf.map(i=> data.sortedRounds[i].isReference ? 'Étalon' : data.sortedRounds[i].date)];
+  function buildAxisBody(field, refField){
+    return s.points.map(pt=> [pt, ...orderPdf.map(i=>{
+      const r = data.sortedRounds[i];
+      if(r.isReference) return data.ref.points[pt] ? fmtCoord(data.ref.points[pt][refField]) : '—';
+      const v = data.results[pt][i];
+      if(!v) return '—';
+      return (v[field]>=0?'+':'')+v[field].toFixed(2);
+    })]);
+  }
+
+  if(y>230){ doc.addPage(); y=16; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Tableau N — Déplacements Nord vs étalon (mm)', marginL, y); y+=3;
+  doc.autoTable({ startY:y+2, head:[orderedHeadPdf], body:buildAxisBody('dN','n'), styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  y = doc.lastAutoTable.finalY+8;
+
+  if(y>230){ doc.addPage(); y=16; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Tableau E — Déplacements Est vs étalon (mm)', marginL, y); y+=3;
+  doc.autoTable({ startY:y+2, head:[orderedHeadPdf], body:buildAxisBody('dE','e'), styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  y = doc.lastAutoTable.finalY+8;
+
+  if(y>230){ doc.addPage(); y=16; }
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Tableau Z — Déplacements verticaux vs étalon (mm)', marginL, y); y+=3;
+  doc.autoTable({ startY:y+2, head:[orderedHeadPdf], body:buildAxisBody('dZ','z'), styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+  y = doc.lastAutoTable.finalY+8;
+
+  {
+    const refStabHere = computeRefStability(cutoffDate);
+    if(refStabHere && s.refPoints.length){
+      if(y>230){ doc.addPage(); y=16; }
+      doc.setFont('helvetica','bold'); doc.setFontSize(11);
+      doc.text('Stabilité des points de référence (réseau stable)', marginL, y); y+=3;
+      const curRHere = currentRoundIndex(refStabHere.sortedRounds);
+      const refBodyHere = s.refPoints.map(pt=>{
+        const ser = refStabHere.out[pt];
+        if(!ser || !ser[curRHere]) return [pt,'—','—','—','—'];
+        const c = ser[curRHere];
+        return [pt, c.mag.toFixed(2), c.dN.toFixed(2), c.dE.toFixed(2), c.dZ.toFixed(2)];
+      });
+      doc.autoTable({ startY:y+2, head:[['Point','Déplacement (mm)','dN (mm)','dE (mm)','dZ (mm)']], body:refBodyHere, styles:{fontSize:8}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
+      y = doc.lastAutoTable.finalY+8;
+    }
+  }
 
   const barCv = document.getElementById('chartBar');
   const lineCv = document.getElementById('chartLine');
@@ -1833,21 +1944,6 @@ function generatePDF(){
     return [r.date, r.operateur||'—', inst? `${inst.fab} ${inst.mod} (série ${inst.ser})` : '—', Object.keys(r.points).join(', '), r.note||''];
   });
   doc.autoTable({ startY:y+2, head:[['Date','Opérateur','Instrument','Points mesurés','Note']], body:histBody, styles:{fontSize:7.5}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
-
-  const refStab = computeRefStability(cutoffDate);
-  if(refStab && s.refPoints.length){
-    doc.addPage(); y=16;
-    doc.setFont('helvetica','bold'); doc.setFontSize(11);
-    doc.text('Stabilité des points de référence (réseau stable)', marginL, y); y+=3;
-    const curR = currentRoundIndex(refStab.sortedRounds);
-    const refBody = s.refPoints.map(pt=>{
-      const ser = refStab.out[pt];
-      if(!ser || !ser[curR]) return [pt,'—','—','—','—'];
-      const c = ser[curR];
-      return [pt, c.mag.toFixed(2), c.dN.toFixed(2), c.dE.toFixed(2), c.dZ.toFixed(2)];
-    });
-    doc.autoTable({ startY:y+2, head:[['Point','Déplacement (mm)','dN (mm)','dE (mm)','dZ (mm)']], body:refBody, styles:{fontSize:8}, headStyles:{fillColor:[28,43,57]}, margin:{left:marginL,right:14} });
-  }
 
   if(s.pairs && s.pairs.length){
     doc.addPage(); y=16;
